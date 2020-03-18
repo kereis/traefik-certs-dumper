@@ -17,6 +17,7 @@ dump() {
 	else
 		log "Certificate or key differ, updating"
 		mv ${WORKDIR}/${DOMAIN}/*.pem /output/
+    restart_containers
 	fi
 }
 
