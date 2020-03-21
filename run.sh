@@ -16,18 +16,18 @@ dump() {
 
 	if [[ -f /tmp/work/${DOMAIN}/cert.pem && -f /tmp/work/${DOMAIN}/key.pem && -f /output/cert.pem && -f /output/key.pem ]] && \
 		diff -q ${WORKDIR}/${DOMAIN}/cert.pem /output/cert.pem >/dev/null && \
-		diff -q ${WORKDIR}/${DOMAIN}/key.pem /output/key.pem >/dev/null ; \
-	then
-		log "Certificate and key still up to date, doing nothing"
-	else
-		log "Certificate or key differ, updating"
-		mv ${WORKDIR}/${DOMAIN}/*.pem /output/
+    diff -q ${WORKDIR}/${DOMAIN}/key.pem /output/key.pem >/dev/null ; \
+  then
+    log "Certificate and key still up to date, doing nothing"
+  else
+    log "Certificate or key differ, updating"
+    mv ${WORKDIR}/${DOMAIN}/*.pem /output/
     
     if [ ! -z "${CONTAINERS#}" ]; then
       log "Trying to restart containers"
       restart_containers
     fi
-	fi
+  fi
 }
 
 restart_containers() {
