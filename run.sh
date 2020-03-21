@@ -1,28 +1,28 @@
 #!/bin/bash
 
-WORKDIR=/tmp/traefik-certs-dumper/
-
+WORKDIR=/tmp/work/
 
 ###############################################
 ####             DUMPING LOGIC             ####
 ###############################################
 
 dump() {
-	log "Clearing dumping directory"
-	rm -rf $WORKDIR/*
+  log "Clearing dumping directory"
+  rm -rf $WORKDIR/*
 
-	log "Dumping certificates"
-	traefik-certs-dumper file --version v2 --crt-name "cert" --crt-ext ".pem" --key-name "key" --key-ext ".pem" --domain-subdir --dest /tmp/work --source /traefik/acme.json > /dev/null
+  log "Dumping certificates"
+  traefik-certs-dumper file --version v2 --crt-name "cert" --crt-ext ".pem" --key-name "key" --key-ext ".pem" --domain-subdir --dest /tmp/work --source /traefik/acme.json >/dev/null
 
-	if [[ -f /tmp/work/${DOMAIN}/cert.pem && -f /tmp/work/${DOMAIN}/key.pem && -f /output/cert.pem && -f /output/key.pem ]] && \
-		diff -q ${WORKDIR}/${DOMAIN}/cert.pem /output/cert.pem >/dev/null && \
-    diff -q ${WORKDIR}/${DOMAIN}/key.pem /output/key.pem >/dev/null ; \
+  if
+    [[ -f /tmp/work/${DOMAIN}/cert.pem && -f /tmp/work/${DOMAIN}/key.pem && -f /output/cert.pem && -f /output/key.pem ]] && \
+    diff -q ${WORKDIR}/${DOMAIN}/cert.pem /output/cert.pem >/dev/null && \
+    diff -q ${WORKDIR}/${DOMAIN}/key.pem /output/key.pem >/dev/null
   then
     log "Certificate and key still up to date, doing nothing"
   else
     log "Certificate or key differ, updating"
     mv ${WORKDIR}/${DOMAIN}/*.pem /output/
-    
+
     if [ ! -z "${CONTAINERS#}" ]; then
       log "Trying to restart containers"
       restart_containers
@@ -64,8 +64,6 @@ log() {
   echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')]: $*"
 }
 
-
-
 ###############################################
 ####      COMMAND LINE ARGS PARSING        ####
 ###############################################
@@ -77,7 +75,6 @@ die() {
   echo "$1" >&2
   exit ${_ret}
 }
-
 
 begins_with_short_option() {
   local first_option all_short_options='rh'
@@ -95,45 +92,42 @@ print_help() {
 }
 
 parse_commandline() {
-  while test $# -gt 0
-  do
+  while test $# -gt 0; do
     _key="$1"
     case "$_key" in
-      -r|--restart-containers)
-        test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-        _arg_restart_containers="$2"
-        shift
-        ;;
-      --restart-containers=*)
-        _arg_restart_containers="${_key##--restart-containers=}"
-        ;;
-      -r*)
-        _arg_restart_containers="${_key##-r}"
-        ;;
-      -h|--help)
-        print_help
-        exit 0
-        ;;
-      -h*)
-        print_help
-        exit 0
-        ;;
-      *)
-        _PRINT_HELP=yes die "FATAL ERROR: Got an unexpected argument '$1'" 1
-        ;;
+    -r | --restart-containers)
+      test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+      _arg_restart_containers="$2"
+      shift
+      ;;
+    --restart-containers=*)
+      _arg_restart_containers="${_key##--restart-containers=}"
+      ;;
+    -r*)
+      _arg_restart_containers="${_key##-r}"
+      ;;
+    -h | --help)
+      print_help
+      exit 0
+      ;;
+    -h*)
+      print_help
+      exit 0
+      ;;
+    *)
+      _PRINT_HELP=yes die "FATAL ERROR: Got an unexpected argument '$1'" 1
+      ;;
     esac
     shift
   done
 }
 
 split_list() {
-  IFS=',' read -ra CONTAINERS <<< "$1"
+  IFS=',' read -ra CONTAINERS <<<"$1"
   log "Values split! Got '${CONTAINERS[@]}'"
 }
 
-
 ###############################################
-
 
 parse_commandline "$@"
 
@@ -148,6 +142,6 @@ mkdir -p ${WORKDIR}
 dump
 
 while true; do
- inotifywait -qq -e modify /traefik/acme.json
- dump
+  inotifywait -qq -e modify /traefik/acme.json
+  dump
 done
