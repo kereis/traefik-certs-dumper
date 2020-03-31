@@ -23,6 +23,11 @@ dump() {
     log "Certificate or key differ, updating"
     mv ${WORKDIR}/${DOMAIN}/*.pem /output/
 
+    if [[ "${OVERRIDE_OWNER}" == "TRUE" && ! -z "${OVERRIDE_UID}" && ! -z "${OVERRIDE_GID}" ]]; then
+      log "Changing ownership of Certificate and key"
+      chown "${OVERRIDE_UID}":"${OVERRIDE_GID}" /output/*.pem 
+    fi
+
     if [ ! -z "${CONTAINERS#}" ]; then
       log "Trying to restart containers"
       restart_containers
