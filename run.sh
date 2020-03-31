@@ -23,9 +23,15 @@ dump() {
     log "Certificate or key differ, updating"
     mv ${WORKDIR}/${DOMAIN}/*.pem /output/
 
-    if [[ "${OVERRIDE_OWNER}" == "TRUE" && ! -z "${OVERRIDE_UID}" && ! -z "${OVERRIDE_GID}" ]]; then
-      log "Changing ownership of Certificate and key"
-      chown "${OVERRIDE_UID}":"${OVERRIDE_GID}" /output/*.pem 
+    if [[ ! -z "${OVERRIDE_UID}" && ! -z "${OVERRIDE_GID}" ]]; then
+      if [[ "${OVERRIDE_UID}" =~ "^[0-9]+$" ]]; then
+        log "UID can only be intergers"
+      elif [[ "${OVERRIDE_GID}" =~ "^[0-9]+$" ]]; then
+        log "GID can only be integers"
+      else
+        log "Changing ownership of Certificate and key"
+        chown "${OVERRIDE_UID}":"${OVERRIDE_GID}" /output/*.pem
+      fi
     fi
 
     if [ ! -z "${CONTAINERS#}" ]; then

@@ -47,5 +47,25 @@ services:
     - DOMAIN=example.org
 ```
 
+### Change ownership of certificate and key files
+If you want to change the onwership of the certificate and keyfile because your container runs on different permissions than root, you can specify the owner of the the owner PID en GID as an environment variable. These environment variables are `OVERRIDE_UID` and `OVERRIDE_GID`. These can only be integers and must both be set for the override to work. For instanse:
+```yaml
+version: '3.7'
+
+services:
+  certdumper:
+    image: humenius/traefik-certs-dumper:latest
+    container_name: traefik_certdumper
+    command: --restart-containers container1,container2,container3
+    volumes:
+    - ./traefik/acme:/traefik:ro
+    - ./output:/output:rw
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+    - DOMAIN=example.org
+    - OVERRIDE_UID=1000
+    - OVERRIDE_GID=1000
+```
+
 ## Help!
 If you need help using this image, have suggestions or want to report a problem, feel free to open an issue on GitHub!
