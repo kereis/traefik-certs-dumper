@@ -1,6 +1,7 @@
 #!/bin/bash
 
 WORKDIR=/tmp/work/
+re='^[0-9]+$'
 
 ###############################################
 ####             DUMPING LOGIC             ####
@@ -23,14 +24,20 @@ dump() {
     log "Certificate or key differ, updating"
     mv ${WORKDIR}/${DOMAIN}/*.pem /output/
 
+    #Check if OVERRIDE_UID and OVERRIDE_GID have been defined
     if [[ ! -z "${OVERRIDE_UID}" && ! -z "${OVERRIDE_GID}" ]]; then
-      if [[ "${OVERRIDE_UID}" =~ "^[0-9]+$" ]]; then
-        log "UID can only be intergers"
-      elif [[ "${OVERRIDE_GID}" =~ "^[0-9]+$" ]]; then
-        log "GID can only be integers"
+      if [[ "${OVERRIDE_UID}" =~ $re || "${OVERRIDE_GID}" =~ $re ]]; then
+          #Check on UID
+          if [[ "${OVERRIDE_UID}" =~ $re ]]; then
+              log "UID can only be intergers"
+          fi
+          #Check on GID
+          if [[ "${OVERRIDE_GID}" =~ $re ]]; then
+              log "GID can only be integers"
+          fi
       else
-        log "Changing ownership of Certificate and key"
-        chown "${OVERRIDE_UID}":"${OVERRIDE_GID}" /output/*.pem
+          log "Changing ownership of Certificate and key"
+          chown "${OVERRIDE_UID}":"${OVERRIDE_GID}" /output/*.pem
       fi
     fi
 
