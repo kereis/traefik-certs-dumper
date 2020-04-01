@@ -36,8 +36,8 @@ dump() {
               log "GID can only be integers"
           fi
       else
-          log "Changing ownership of Certificate and key"
-          chown "${OVERRIDE_UID}":"${OVERRIDE_GID}" /output/*.pem
+        log "Changing ownership of Certificate and key"
+        chown "${OVERRIDE_UID}":"${OVERRIDE_GID}" /output/*.pem
       fi
     fi
 
