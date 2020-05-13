@@ -1,6 +1,7 @@
 #!/bin/bash
 
 WORKDIR=/tmp/work/
+re='^[0-9]+$'
 
 ###############################################
 ####             DUMPING LOGIC             ####
@@ -22,6 +23,23 @@ dump() {
   else
     log "Certificate or key differ, updating"
     mv ${WORKDIR}/${DOMAIN}/*.pem /output/
+
+    if [[ ! -z "${OVERRIDE_UID}" && ! -z "${OVERRIDE_GID}" ]]; then
+      if [[ ! "${OVERRIDE_UID}" =~ $re || ! "${OVERRIDE_GID}" =~ $re ]]; then
+          #Check on UID
+          if [[ ! "${OVERRIDE_UID}" =~ $re ]]; then
+              log "OVERRIDE_UID=${OVERRIDE_UID} is not an integer."
+          fi
+          #Check on GID
+          if [[ ! "${OVERRIDE_GID}" =~ $re ]]; then
+              log "OVERRIDE_GID=${OVERRIDE_GID} is not an integer."
+          fi
+          log "Combination ${OVERRIDE_UID}:${OVERRIDE_GID} is invalid. Skipping file ownership change..."
+      else
+          log "Changing ownership of certificate and key"
+          chown "${OVERRIDE_UID}":"${OVERRIDE_GID}" /output/*.pem
+      fi
+    fi
 
     if [ ! -z "${CONTAINERS#}" ]; then
       log "Trying to restart containers"
