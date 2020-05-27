@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 WORKDIR=/tmp/work/
 re='^[0-9]+$'
@@ -167,11 +168,6 @@ parse_commandline() {
   done
 }
 
-split_list() {
-  IFS=',' read -ra "$2" <<< "$1"
-  log "Values split! Got '${$2[@]}'"
-}
-
 ###############################################
 
 parse_commandline "$@"
@@ -180,14 +176,16 @@ if [ -z "${_arg_restart_containers}" ]; then
   log "--restart-containers is empty. Won't attempt to restart containers."
 else
   log "Got value of --restart-containers: ${_arg_restart_containers}. Splitting values."
-  split_list "${_arg_restart_containers}" CONTAINERS
+  IFS=',' read -ra CONTAINERS <<< "$_arg_restart_containers"
+  log "Values split! Got '${CONTAINERS[@]}'"
 fi
 
 if [ -z "${DOMAIN}" ]; then
-  die "Environment variable 'DOMAIN' mustn't be empty. Exiting..." 1
+  die "Environment variable DOMAIN mustn't be empty. Exiting..." 1
 else
-  log "Got value of 'DOMAIN': ${DOMAIN}. Splitting values."
-  split_list "${DOMAIN}" DOMAINS
+  log "Got value of DOMAIN: ${DOMAIN}. Splitting values."
+  IFS=',' read -ra DOMAINS <<< "$DOMAIN"
+  log "Values split! Got '${DOMAINS[@]}'"
 fi
 
 mkdir -p ${WORKDIR}
