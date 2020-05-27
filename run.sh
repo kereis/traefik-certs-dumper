@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-WORKDIR=/tmp/work
+workdir=/tmp/work
+outputdir=/output
 re='^[0-9]+$'
 
 ###############################################
@@ -10,7 +11,7 @@ re='^[0-9]+$'
 
 dump() {
   log "Clearing dumping directory"
-  rm -rf ${WORKDIR}/*
+  rm -rf ${workdir}/*
 
   log "Dumping certificates"
   traefik-certs-dumper file \
@@ -26,26 +27,29 @@ dump() {
   if [ "${#DOMAINS[@]}" -gt 1 ]; then
     for i in "${DOMAINS[@]}" ; do
       if
-        [[ -f ${WORKDIR}/${i}/cert.pem && -f ${WORKDIR}/${i}/key.pem && -f /output/${i}/cert.pem && -f /output/${i}/key.pem ]] && \
-        diff -q ${WORKDIR}/${i}/cert.pem /output/{$i}/cert.pem >/dev/null && \
-        diff -q ${WORKDIR}/${i}/key.pem /output/{$i}/key.pem >/dev/null
+        [[ -f ${workdir}/${i}/cert.pem && -f ${workdir}/${i}/key.pem && -f ${outputdir}/${i}/cert.pem && -f ${outputdir}/${i}/key.pem ]] && \
+        diff -q ${workdir}/${i}/cert.pem ${outputdir}/{$i}/cert.pem >/dev/null && \
+        diff -q ${workdir}/${i}/key.pem ${outputdir}/{$i}/key.pem >/dev/null
       then
         log "Certificate and key for '${i}' still up to date, doing nothing"
       else
         log "Certificate or key for '${i}' differ, updating"
-        mv ${WORKDIR}/${i}/*.pem /output/${i}
+        local dir=${outputdir}/${i}
+        [ -a "$dir" ] || \
+        mkdir -p $dir && \
+        mv ${workdir}/${i}/*.pem $dir
       fi
     done
   else
     if
-      [[ -f ${WORKDIR}/${DOMAIN}/cert.pem && -f ${WORKDIR}/${DOMAIN}/key.pem && -f /output/cert.pem && -f /output/key.pem ]] && \
-      diff -q ${WORKDIR}/${DOMAIN}/cert.pem /output/cert.pem >/dev/null && \
-      diff -q ${WORKDIR}/${DOMAIN}/key.pem /output/key.pem >/dev/null
+      [[ -f ${workdir}/${DOMAIN}/cert.pem && -f ${workdir}/${DOMAIN}/key.pem && -f ${outputdir}/cert.pem && -f ${outputdir}/key.pem ]] && \
+      diff -q ${workdir}/${DOMAIN}/cert.pem ${outputdir}/cert.pem >/dev/null && \
+      diff -q ${workdir}/${DOMAIN}/key.pem ${outputdir}/key.pem >/dev/null
     then
       log "Certificate and key for '${DOMAIN}' still up to date, doing nothing"
     else
       log "Certificate or key for '${DOMAIN}' differ, updating"
-      mv ${WORKDIR}/${DOMAIN}/*.pem /output/
+      mv ${workdir}/${DOMAIN}/*.pem ${outputdir}/
     fi
   fi
 
@@ -62,7 +66,7 @@ dump() {
       log "Combination ${OVERRIDE_UID}:${OVERRIDE_GID} is invalid. Skipping file ownership change..."
     else
       log "Changing ownership of certificates and keys"
-      find /output/ -type f -name "*.pem" -print0 | xargs chown "${OVERRIDE_UID}":"${OVERRIDE_GID}"
+      find ${outputdir}/ -type f -name "*.pem" -print0 | xargs chown "${OVERRIDE_UID}":"${OVERRIDE_GID}"
     fi
   fi
 
@@ -188,7 +192,7 @@ else
   log "Values split! Got '${DOMAINS[@]}'"
 fi
 
-mkdir -p ${WORKDIR}
+mkdir -p ${workdir}
 dump
 
 while true; do
