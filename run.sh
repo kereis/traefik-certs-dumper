@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-WORKDIR=/tmp/work/
+WORKDIR=/tmp/work
 re='^[0-9]+$'
 
 ###############################################
@@ -10,7 +10,7 @@ re='^[0-9]+$'
 
 dump() {
   log "Clearing dumping directory"
-  rm -rf $WORKDIR/*
+  rm -rf ${WORKDIR}/*
 
   log "Dumping certificates"
   traefik-certs-dumper file \
@@ -26,19 +26,19 @@ dump() {
   if [ "${#DOMAINS[@]}" -gt 1 ]; then
     for i in "${DOMAINS[@]}" ; do
       if
-        [[ -f /tmp/work/${i}/cert.pem && -f /tmp/work/${i}/key.pem && -f /output/${i}/cert.pem && -f /output/${i}/key.pem ]] && \
+        [[ -f ${WORKDIR}/${i}/cert.pem && -f ${WORKDIR}/${i}/key.pem && -f /output/${i}/cert.pem && -f /output/${i}/key.pem ]] && \
         diff -q ${WORKDIR}/${i}/cert.pem /output/{$i}/cert.pem >/dev/null && \
         diff -q ${WORKDIR}/${i}/key.pem /output/{$i}/key.pem >/dev/null
       then
         log "Certificate and key for '${i}' still up to date, doing nothing"
       else
         log "Certificate or key for '${i}' differ, updating"
-        mv ${WORKDIR}/${i}/*.pem /output/
+        mv ${WORKDIR}/${i}/*.pem /output/${i}
       fi
     done
   else
     if
-      [[ -f /tmp/work/${DOMAIN}/cert.pem && -f /tmp/work/${DOMAIN}/key.pem && -f /output/cert.pem && -f /output/key.pem ]] && \
+      [[ -f ${WORKDIR}/${DOMAIN}/cert.pem && -f ${WORKDIR}/${DOMAIN}/key.pem && -f /output/cert.pem && -f /output/key.pem ]] && \
       diff -q ${WORKDIR}/${DOMAIN}/cert.pem /output/cert.pem >/dev/null && \
       diff -q ${WORKDIR}/${DOMAIN}/key.pem /output/key.pem >/dev/null
     then
