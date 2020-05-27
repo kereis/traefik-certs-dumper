@@ -67,5 +67,26 @@ services:
     - OVERRIDE_GID=1000
 ```
 
+### Extract multiple domains
+This Docker image is able to extract multiple domains as well. 
+Use environment variable `DOMAIN` and add you domains as a comma-separated list.
+After certificate dumping, the certificates can be found in the domains' subdirectories respectively.
+(`/output/DOMAIN[i]/...`)
+If you specify a single domain, the output folder remains the same as in previous versions (< v1.3 - `/output`).
+```yaml
+version: '3.7'
+
+services:
+  certdumper:
+    image: humenius/traefik-certs-dumper:latest
+    container_name: traefik_certdumper
+    volumes:
+    - ./traefik/acme:/traefik:ro
+    - ./output:/output:rw
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      DOMAIN: example.com,example.org,example.net,hello.example.in
+```
+
 ## Help!
 If you need help using this image, have suggestions or want to report a problem, feel free to open an issue on GitHub!
