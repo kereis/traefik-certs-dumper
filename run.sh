@@ -23,12 +23,12 @@ dump() {
     --dest /tmp/work \
     --source /traefik/acme.json >/dev/null
 
-  if [ "${DOMAINS#}" -gt 1 ]; then
+  if [ "${#DOMAINS[@]}" -gt 1 ]; then
     for i in "${DOMAINS[@]}" ; do
       if
         [[ -f /tmp/work/${i}/cert.pem && -f /tmp/work/${i}/key.pem && -f /output/${i}/cert.pem && -f /output/${i}/key.pem ]] && \
-        diff -q ${WORKDIR}/${i}/cert.pem /output/cert.pem >/dev/null && \
-        diff -q ${WORKDIR}/${i}/key.pem /output/key.pem >/dev/null
+        diff -q ${WORKDIR}/${i}/cert.pem /output/{$i}/cert.pem >/dev/null && \
+        diff -q ${WORKDIR}/${i}/key.pem /output/{$i}/key.pem >/dev/null
       then
         log "Certificate and key for '${i}' still up to date, doing nothing"
       else
@@ -62,7 +62,7 @@ dump() {
       log "Combination ${OVERRIDE_UID}:${OVERRIDE_GID} is invalid. Skipping file ownership change..."
     else
       log "Changing ownership of certificates and keys"
-      find /output/ -type f -name "*.pem" | xargs -0 chown "${OVERRIDE_UID}":"${OVERRIDE_GID}"
+      find /output/ -type f -name "*.pem" -print0 | xargs chown "${OVERRIDE_UID}":"${OVERRIDE_GID}"
     fi
   fi
 
