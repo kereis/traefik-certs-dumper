@@ -12,39 +12,62 @@ dump() {
   rm -rf $WORKDIR/*
 
   log "Dumping certificates"
-  traefik-certs-dumper file --version v2 --crt-name "cert" --crt-ext ".pem" --key-name "key" --key-ext ".pem" --domain-subdir --dest /tmp/work --source /traefik/acme.json >/dev/null
+  traefik-certs-dumper file \
+    --version v2 \
+    --crt-name "cert" \
+    --crt-ext ".pem" \
+    --key-name "key" \
+    --key-ext ".pem" \
+    --domain-subdir \
+    --dest /tmp/work \
+    --source /traefik/acme.json >/dev/null
 
-  if
-    [[ -f /tmp/work/${DOMAIN}/cert.pem && -f /tmp/work/${DOMAIN}/key.pem && -f /output/cert.pem && -f /output/key.pem ]] && \
-    diff -q ${WORKDIR}/${DOMAIN}/cert.pem /output/cert.pem >/dev/null && \
-    diff -q ${WORKDIR}/${DOMAIN}/key.pem /output/key.pem >/dev/null
-  then
-    log "Certificate and key still up to date, doing nothing"
-  else
-    log "Certificate or key differ, updating"
-    mv ${WORKDIR}/${DOMAIN}/*.pem /output/
-
-    if [[ ! -z "${OVERRIDE_UID}" && ! -z "${OVERRIDE_GID}" ]]; then
-      if [[ ! "${OVERRIDE_UID}" =~ $re || ! "${OVERRIDE_GID}" =~ $re ]]; then
-          #Check on UID
-          if [[ ! "${OVERRIDE_UID}" =~ $re ]]; then
-              log "OVERRIDE_UID=${OVERRIDE_UID} is not an integer."
-          fi
-          #Check on GID
-          if [[ ! "${OVERRIDE_GID}" =~ $re ]]; then
-              log "OVERRIDE_GID=${OVERRIDE_GID} is not an integer."
-          fi
-          log "Combination ${OVERRIDE_UID}:${OVERRIDE_GID} is invalid. Skipping file ownership change..."
+  if [ "${DOMAINS#}" -gt 1 ]; then
+    for i in "${DOMAINS[@]}" ; do
+      if
+        [[ -f /tmp/work/${i}/cert.pem && -f /tmp/work/${i}/key.pem && -f /output/${i}/cert.pem && -f /output/${i}/key.pem ]] && \
+        diff -q ${WORKDIR}/${i}/cert.pem /output/cert.pem >/dev/null && \
+        diff -q ${WORKDIR}/${i}/key.pem /output/key.pem >/dev/null
+      then
+        log "Certificate and key for '${i}' still up to date, doing nothing"
       else
-          log "Changing ownership of certificate and key"
-          chown "${OVERRIDE_UID}":"${OVERRIDE_GID}" /output/*.pem
+        log "Certificate or key for '${i}' differ, updating"
+        mv ${WORKDIR}/${i}/*.pem /output/
       fi
+    done
+  else
+    if
+      [[ -f /tmp/work/${DOMAIN}/cert.pem && -f /tmp/work/${DOMAIN}/key.pem && -f /output/cert.pem && -f /output/key.pem ]] && \
+      diff -q ${WORKDIR}/${DOMAIN}/cert.pem /output/cert.pem >/dev/null && \
+      diff -q ${WORKDIR}/${DOMAIN}/key.pem /output/key.pem >/dev/null
+    then
+      log "Certificate and key for '${DOMAIN}' still up to date, doing nothing"
+    else
+      log "Certificate or key for '${DOMAIN}' differ, updating"
+      mv ${WORKDIR}/${DOMAIN}/*.pem /output/
     fi
+  fi
 
-    if [ ! -z "${CONTAINERS#}" ]; then
-      log "Trying to restart containers"
-      restart_containers
+  if [[ ! -z "${OVERRIDE_UID}" && ! -z "${OVERRIDE_GID}" ]]; then
+    if [[ ! "${OVERRIDE_UID}" =~ $re || ! "${OVERRIDE_GID}" =~ $re ]]; then
+      #Check on UID
+      if [[ ! "${OVERRIDE_UID}" =~ $re ]]; then
+          log "OVERRIDE_UID=${OVERRIDE_UID} is not an integer."
+      fi
+      #Check on GID
+      if [[ ! "${OVERRIDE_GID}" =~ $re ]]; then
+          log "OVERRIDE_GID=${OVERRIDE_GID} is not an integer."
+      fi
+      log "Combination ${OVERRIDE_UID}:${OVERRIDE_GID} is invalid. Skipping file ownership change..."
+    else
+      log "Changing ownership of certificates and keys"
+      find /output/ -type f -name "*.pem" | xargs -0 chown "${OVERRIDE_UID}":"${OVERRIDE_GID}"
     fi
+  fi
+
+  if [ ! -z "${CONTAINERS#}" ]; then
+    log "Trying to restart containers"
+    restart_containers
   fi
 }
 
@@ -101,12 +124,16 @@ begins_with_short_option() {
 }
 
 _arg_restart_containers=
+CONTAINERS=
+DOMAINS=
 
 print_help() {
   printf '%s\n' "traefik-certs-dumper bash script by Humenius <contact@humenius.me>"
   printf 'Usage: %s [-r|--restart-containers <arg>] [-h|--help]\n' "$0"
   printf '\t%s\n' "-r, --restart-containers: Restart containers passed as comma-separated container names (no default)"
   printf '\t%s\n' "-h, --help: Prints help"
+  printf 'Environment variables:\n'
+  printf '\t%s\n' "DOMAIN: Domains whose certificates will be extracted"
 }
 
 parse_commandline() {
@@ -141,8 +168,8 @@ parse_commandline() {
 }
 
 split_list() {
-  IFS=',' read -ra CONTAINERS <<<"$1"
-  log "Values split! Got '${CONTAINERS[@]}'"
+  IFS=',' read -ra "$2" <<< "$1"
+  log "Values split! Got '${$2[@]}'"
 }
 
 ###############################################
@@ -150,10 +177,17 @@ split_list() {
 parse_commandline "$@"
 
 if [ -z "${_arg_restart_containers}" ]; then
-  log "--restart-containers is empty. Won't restart containers."
+  log "--restart-containers is empty. Won't attempt to restart containers."
 else
   log "Got value of --restart-containers: ${_arg_restart_containers}. Splitting values."
-  split_list "${_arg_restart_containers}"
+  split_list "${_arg_restart_containers}" CONTAINERS
+fi
+
+if [ -z "${DOMAIN}" ]; then
+  die "Environment variable 'DOMAIN' mustn't be empty. Exiting..." 1
+else
+  log "Got value of 'DOMAIN': ${DOMAIN}. Splitting values."
+  split_list "${DOMAIN}" DOMAINS
 fi
 
 mkdir -p ${WORKDIR}
