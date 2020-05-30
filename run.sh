@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 workdir=/tmp/work
 outputdir=/output
@@ -37,7 +36,11 @@ dump() {
         local dir=${outputdir}/${i}
         [ -a "$dir" ] || \
         mkdir -p $dir && \
-        mv ${workdir}/${i}/*.pem $dir
+        mv ${workdir}/${i}/*.pem ${dir}/
+
+        if [ ! $? -eq 0 ]; then
+          err "Could not move certificates for domain '${i}' to output folder. Certificates probably may not exist."
+        fi
       fi
     done
   else
@@ -50,6 +53,11 @@ dump() {
     else
       log "Certificate or key for '${DOMAIN}' differ, updating"
       mv ${workdir}/${DOMAIN}/*.pem ${outputdir}/
+
+      if [ ! $? -eq 0 ]; then
+        err "Could not move certificates for domain '${DOMAIN}' to output folder. Certificates probably may not exist."
+        return 1
+      fi
     fi
   fi
 
