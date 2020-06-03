@@ -43,19 +43,19 @@ dump() {
     done
   else
     if
-      [[ -f ${workdir}/${DOMAIN}/cert.pem && -f ${workdir}/${DOMAIN}/key.pem && \
+      [[ -f ${workdir}/${DOMAINS[1]}/cert.pem && -f ${workdir}/${DOMAINS[1]}/key.pem && \
          -f ${outputdir}/cert.pem && -f ${outputdir}/key.pem ]]
     then
-      if diff -q ${workdir}/${DOMAIN}/cert.pem ${outputdir}/cert.pem >/dev/null && \
-         diff -q ${workdir}/${DOMAIN}/key.pem ${outputdir}/key.pem >/dev/null
+      if diff -q ${workdir}/${DOMAINS[1]}/cert.pem ${outputdir}/cert.pem >/dev/null && \
+         diff -q ${workdir}/${DOMAINS[1]}/key.pem ${outputdir}/key.pem >/dev/null
       then
-        log "Certificate and key for '${DOMAIN}' still up to date, doing nothing"
+        log "Certificate and key for '${DOMAINS[1]}' still up to date, doing nothing"
       else
-        log "Certificate or key for '${DOMAIN}' differ, updating"
-        mv ${workdir}/${DOMAIN}/*.pem ${outputdir}/
+        log "Certificate or key for '${DOMAINS[1]}' differ, updating"
+        mv ${workdir}/${DOMAINS[1]}/*.pem ${outputdir}/
       fi
     else
-      err "Certificates for domain '${i}' don't exist. Omitting..."
+      err "Certificates for domain '${DOMAINS[1]}' don't exist. Omitting..."
     fi
   fi
 
