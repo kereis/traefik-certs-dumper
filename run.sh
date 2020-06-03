@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 workdir=/tmp/work
 outputdir=/output
@@ -27,29 +26,37 @@ dump() {
   if [ "${#DOMAINS[@]}" -gt 1 ]; then
     for i in "${DOMAINS[@]}" ; do
       if
-        [[ -f ${workdir}/${i}/cert.pem && -f ${workdir}/${i}/key.pem && -f ${outputdir}/${i}/cert.pem && -f ${outputdir}/${i}/key.pem ]] && \
-        diff -q ${workdir}/${i}/cert.pem ${outputdir}/{$i}/cert.pem >/dev/null && \
-        diff -q ${workdir}/${i}/key.pem ${outputdir}/{$i}/key.pem >/dev/null
+        [[ -f ${workdir}/${i}/cert.pem && -f ${workdir}/${i}/key.pem ]]
       then
-        log "Certificate and key for '${i}' still up to date, doing nothing"
+        if [[ -f ${outputdir}/${i}/cert.pem && -f ${outputdir}/${i}/key.pem ]] && \
+           diff -q ${workdir}/$i/cert.pem ${outputdir}/$i/cert.pem >/dev/null && \
+           diff -q ${workdir}/$i/key.pem ${outputdir}/$i/key.pem >/dev/null
+        then
+          log "Certificate and key for '${i}' still up to date, doing nothing"
+        else
+          log "Certificate or key for '${i}' differ, updating"
+          local dir=${outputdir}/${i}
+          mkdir -p ${dir} && mv ${workdir}/${i}/*.pem ${dir}
+        fi
       else
-        log "Certificate or key for '${i}' differ, updating"
-        local dir=${outputdir}/${i}
-        [ -a "$dir" ] || \
-        mkdir -p $dir && \
-        mv ${workdir}/${i}/*.pem $dir
+        err "Certificates for domain '${i}' don't exist. Omitting..."
       fi
     done
   else
     if
-      [[ -f ${workdir}/${DOMAIN}/cert.pem && -f ${workdir}/${DOMAIN}/key.pem && -f ${outputdir}/cert.pem && -f ${outputdir}/key.pem ]] && \
-      diff -q ${workdir}/${DOMAIN}/cert.pem ${outputdir}/cert.pem >/dev/null && \
-      diff -q ${workdir}/${DOMAIN}/key.pem ${outputdir}/key.pem >/dev/null
+      [[ -f ${workdir}/${DOMAINS[0]}/cert.pem && -f ${workdir}/${DOMAINS[0]}/key.pem ]]
     then
-      log "Certificate and key for '${DOMAIN}' still up to date, doing nothing"
+      if [[ -f ${outputdir}/cert.pem && -f ${outputdir}/key.pem ]] && \
+         diff -q ${workdir}/${DOMAINS[0]}/cert.pem ${outputdir}/cert.pem >/dev/null && \
+         diff -q ${workdir}/${DOMAINS[0]}/key.pem ${outputdir}/key.pem >/dev/null
+      then
+        log "Certificate and key for '${DOMAINS[0]}' still up to date, doing nothing"
+      else
+        log "Certificate or key for '${DOMAINS[0]}' differ, updating"
+        mv ${workdir}/${DOMAINS[0]}/*.pem ${outputdir}/
+      fi
     else
-      log "Certificate or key for '${DOMAIN}' differ, updating"
-      mv ${workdir}/${DOMAIN}/*.pem ${outputdir}/
+      err "Certificates for domain '${DOMAINS[0]}' don't exist. Omitting..."
     fi
   fi
 
