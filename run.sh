@@ -26,38 +26,38 @@ dump() {
   if [ "${#DOMAINS[@]}" -gt 1 ]; then
     for i in "${DOMAINS[@]}" ; do
       if
-        [[ -f ${workdir}/${i}/cert.pem && -f ${workdir}/${i}/key.pem && -f ${outputdir}/${i}/cert.pem && -f ${outputdir}/${i}/key.pem ]] && \
-        diff -q ${workdir}/${i}/cert.pem ${outputdir}/{$i}/cert.pem >/dev/null && \
-        diff -q ${workdir}/${i}/key.pem ${outputdir}/{$i}/key.pem >/dev/null
+        # 1. Check existence of file
+        [[ -f ${workdir}/${i}/cert.pem && -f ${workdir}/${i}/key.pem && \
+           -f ${outputdir}/${i}/cert.pem && -f ${outputdir}/${i}/key.pem ]]
       then
-        log "Certificate and key for '${i}' still up to date, doing nothing"
-      else
-        log "Certificate or key for '${i}' differ, updating"
-        local dir=${outputdir}/${i}
-        [ -a "$dir" ] || \
-        mkdir -p $dir && \
-        mv ${workdir}/${i}/*.pem ${dir}/
-
-        if [ ! $? -eq 0 ]; then
-          err "Could not move certificates for domain '${i}' to output folder. Certificates probably may not exist."
+        # 2. Check file diff
+        if diff -q ${workdir}/${i}/cert.pem ${outputdir}/{$i}/cert.pem >/dev/null && \
+           diff -q ${workdir}/${i}/key.pem ${outputdir}/{$i}/key.pem >/dev/null
+        then
+          log "Certificate and key for '${i}' still up to date, doing nothing"
+        else
+          log "Certificate or key for '${i}' differ, updating"
+          mv ${workdir}/${i}/*.pem ${dir}/
         fi
+      else
+        err "Certificates for domain '${i}' don't exist. Omitting..."
       fi
     done
   else
     if
-      [[ -f ${workdir}/${DOMAIN}/cert.pem && -f ${workdir}/${DOMAIN}/key.pem && -f ${outputdir}/cert.pem && -f ${outputdir}/key.pem ]] && \
-      diff -q ${workdir}/${DOMAIN}/cert.pem ${outputdir}/cert.pem >/dev/null && \
-      diff -q ${workdir}/${DOMAIN}/key.pem ${outputdir}/key.pem >/dev/null
+      [[ -f ${workdir}/${DOMAIN}/cert.pem && -f ${workdir}/${DOMAIN}/key.pem && \
+         -f ${outputdir}/cert.pem && -f ${outputdir}/key.pem ]]
     then
-      log "Certificate and key for '${DOMAIN}' still up to date, doing nothing"
-    else
-      log "Certificate or key for '${DOMAIN}' differ, updating"
-      mv ${workdir}/${DOMAIN}/*.pem ${outputdir}/
-
-      if [ ! $? -eq 0 ]; then
-        err "Could not move certificates for domain '${DOMAIN}' to output folder. Certificates probably may not exist."
-        return 1
+      if diff -q ${workdir}/${DOMAIN}/cert.pem ${outputdir}/cert.pem >/dev/null && \
+         diff -q ${workdir}/${DOMAIN}/key.pem ${outputdir}/key.pem >/dev/null
+      then
+        log "Certificate and key for '${DOMAIN}' still up to date, doing nothing"
+      else
+        log "Certificate or key for '${DOMAIN}' differ, updating"
+        mv ${workdir}/${DOMAIN}/*.pem ${outputdir}/
       fi
+    else
+      err "Certificates for domain '${i}' don't exist. Omitting..."
     fi
   fi
 
