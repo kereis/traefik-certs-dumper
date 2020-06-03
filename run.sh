@@ -26,16 +26,17 @@ dump() {
   if [ "${#DOMAINS[@]}" -gt 1 ]; then
     for i in "${DOMAINS[@]}" ; do
       if
-        [[ -f ${workdir}/${i}/cert.pem && -f ${workdir}/${i}/key.pem && \
-           -f ${outputdir}/${i}/cert.pem && -f ${outputdir}/${i}/key.pem ]]
+        [[ -f ${workdir}/${i}/cert.pem && -f ${workdir}/${i}/key.pem ]]
       then
-        if diff -q ${workdir}/$i/cert.pem ${outputdir}/$i/cert.pem >/dev/null && \
+        if [[ -f ${outputdir}/${i}/cert.pem && -f ${outputdir}/${i}/key.pem ]] && \
+           diff -q ${workdir}/$i/cert.pem ${outputdir}/$i/cert.pem >/dev/null && \
            diff -q ${workdir}/$i/key.pem ${outputdir}/$i/key.pem >/dev/null
         then
           log "Certificate and key for '${i}' still up to date, doing nothing"
         else
           log "Certificate or key for '${i}' differ, updating"
-          mv ${workdir}/${i}/*.pem ${dir}/
+          local dir=${outputdir}/${i}
+          mkdir -p ${dir} && mv ${workdir}/${i}/*.pem ${dir}
         fi
       else
         err "Certificates for domain '${i}' don't exist. Omitting..."
@@ -43,19 +44,19 @@ dump() {
     done
   else
     if
-      [[ -f ${workdir}/${DOMAINS[1]}/cert.pem && -f ${workdir}/${DOMAINS[1]}/key.pem && \
-         -f ${outputdir}/cert.pem && -f ${outputdir}/key.pem ]]
+      [[ -f ${workdir}/${DOMAINS[0]}/cert.pem && -f ${workdir}/${DOMAINS[0]}/key.pem ]]
     then
-      if diff -q ${workdir}/${DOMAINS[1]}/cert.pem ${outputdir}/cert.pem >/dev/null && \
-         diff -q ${workdir}/${DOMAINS[1]}/key.pem ${outputdir}/key.pem >/dev/null
+      if [[ -f ${outputdir}/cert.pem && -f ${outputdir}/key.pem ]] && \
+         diff -q ${workdir}/${DOMAINS[0]}/cert.pem ${outputdir}/cert.pem >/dev/null && \
+         diff -q ${workdir}/${DOMAINS[0]}/key.pem ${outputdir}/key.pem >/dev/null
       then
-        log "Certificate and key for '${DOMAINS[1]}' still up to date, doing nothing"
+        log "Certificate and key for '${DOMAINS[0]}' still up to date, doing nothing"
       else
-        log "Certificate or key for '${DOMAINS[1]}' differ, updating"
-        mv ${workdir}/${DOMAINS[1]}/*.pem ${outputdir}/
+        log "Certificate or key for '${DOMAINS[0]}' differ, updating"
+        mv ${workdir}/${DOMAINS[0]}/*.pem ${outputdir}/
       fi
     else
-      err "Certificates for domain '${DOMAINS[1]}' don't exist. Omitting..."
+      err "Certificates for domain '${DOMAINS[0]}' don't exist. Omitting..."
     fi
   fi
 
