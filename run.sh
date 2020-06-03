@@ -26,13 +26,11 @@ dump() {
   if [ "${#DOMAINS[@]}" -gt 1 ]; then
     for i in "${DOMAINS[@]}" ; do
       if
-        # 1. Check existence of file
         [[ -f ${workdir}/${i}/cert.pem && -f ${workdir}/${i}/key.pem && \
            -f ${outputdir}/${i}/cert.pem && -f ${outputdir}/${i}/key.pem ]]
       then
-        # 2. Check file diff
-        if diff -q ${workdir}/${i}/cert.pem ${outputdir}/{$i}/cert.pem >/dev/null && \
-           diff -q ${workdir}/${i}/key.pem ${outputdir}/{$i}/key.pem >/dev/null
+        if diff -q ${workdir}/$i/cert.pem ${outputdir}/$i/cert.pem >/dev/null && \
+           diff -q ${workdir}/$i/key.pem ${outputdir}/$i/key.pem >/dev/null
         then
           log "Certificate and key for '${i}' still up to date, doing nothing"
         else
