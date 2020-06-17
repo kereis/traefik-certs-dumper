@@ -37,6 +37,8 @@ dump() {
           log "Certificate or key for '${i}' differ, updating"
           local dir=${outputdir}/${i}
           mkdir -p ${dir} && mv ${workdir}/${i}/*.pem ${dir}
+          change_ownership
+          restart_containers
         fi
       else
         err "Certificates for domain '${i}' don't exist. Omitting..."
@@ -54,12 +56,16 @@ dump() {
       else
         log "Certificate or key for '${DOMAINS[0]}' differ, updating"
         mv ${workdir}/${DOMAINS[0]}/*.pem ${outputdir}/
+        change_ownership
+        restart_containers
       fi
     else
       err "Certificates for domain '${DOMAINS[0]}' don't exist. Omitting..."
     fi
   fi
+}
 
+change_ownership() {
   if [[ ! -z "${OVERRIDE_UID}" && ! -z "${OVERRIDE_GID}" ]]; then
     if [[ ! "${OVERRIDE_UID}" =~ $re || ! "${OVERRIDE_GID}" =~ $re ]]; then
       #Check on UID
@@ -79,37 +85,36 @@ dump() {
       done
     fi
   fi
-
-  if [ ! -z "${CONTAINERS#}" ]; then
-    log "Trying to restart containers"
-    restart_containers
-  fi
 }
 
 restart_containers() {
-  for i in "${CONTAINERS[@]}"; do
-    log "Looking up container with name ${i}"
+  if [ ! -z "${CONTAINERS#}" ]; then
+    log "Trying to restart containers"
+    
+    for i in "${CONTAINERS[@]}"; do
+      log "Looking up container with name ${i}"
 
-    local found_container=$(docker ps -qaf name="${i}")
-    if [ ! -z "${found_container}" ]; then
-      log "Found '${found_container}'. Restarting now..."
+      local found_container=$(docker ps -qaf name="${i}")
+      if [ ! -z "${found_container}" ]; then
+        log "Found '${found_container}'. Restarting now..."
 
-      docker restart ${found_container}
+        docker restart ${found_container}
 
-      if [ $? -eq 0 ]; then
-        log "Restarting container '${found_container}' was successful"
+        if [ $? -eq 0 ]; then
+          log "Restarting container '${found_container}' was successful"
+        else
+          err "
+          Something went wrong while restarting '${found_container}'
+          Please check health of containers and consider restarting them manually.
+          "
+        fi
       else
-        err "
-        Something went wrong while restarting '${found_container}'
-        Please check health of containers and consider restarting them manually.
-        "
+        err "Container '${i}' could not be found. Omitting container..."
       fi
-    else
-      err "Container '${i}' could not be found. Omitting container..."
-    fi
-  done
+    done
 
-  log "Container restarting process done."
+    log "Container restarting process done."
+  fi
 }
 
 err() {
