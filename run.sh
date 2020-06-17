@@ -75,6 +75,7 @@ dump() {
       log "Changing ownership of certificates and keys"
       find ${outputdir}/ -type f -name "*.pem" | while read f ;do 
         chown "${OVERRIDE_UID}":"${OVERRIDE_GID}" "$f"
+        chmod g+r "$f"
       done
     fi
   fi
