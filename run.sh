@@ -73,7 +73,9 @@ dump() {
       log "Combination ${OVERRIDE_UID}:${OVERRIDE_GID} is invalid. Skipping file ownership change..."
     else
       log "Changing ownership of certificates and keys"
-      find ${outputdir}/ -type f -name "*.pem" -print0 | xargs chown "${OVERRIDE_UID}":"${OVERRIDE_GID}"
+      find ${outputdir}/ -type f -name "*.pem" | while read f ;do 
+        chown "${OVERRIDE_UID}":"${OVERRIDE_GID}" "$f"
+      done
     fi
   fi
 
