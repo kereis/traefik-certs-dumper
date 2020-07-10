@@ -1,7 +1,7 @@
 # traefik-certs-dumper
 
 [![Docker Layers](https://images.microbadger.com/badges/image/humenius/traefik-certs-dumper.svg)](https://hub.docker.com/r/humenius/traefik-certs-dumper)
-[![Docker Image Latest Version](https://images.microbadger.com/badges/version/humenius/traefik-certs-dumper:1.2.svg)](https://hub.docker.com/r/humenius/traefik-certs-dumper)
+[![Docker Image Latest Version](https://images.microbadger.com/badges/version/humenius/traefik-certs-dumper:1.3.2.svg)](https://hub.docker.com/r/humenius/traefik-certs-dumper)
 
 Dumps Let's Encrypt certificates of a specified domain to `.pem` and `.key` files which Traefik stores in `acme.json`. 
 
