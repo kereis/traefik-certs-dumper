@@ -1,0 +1,10 @@
+name: docker-build-image
+inputs:
+  dockerfile:
+    default: Dockerfile
+    required: true
+  architecture:
+    required: true
+runs:
+  using: node12
+  main: index.js
