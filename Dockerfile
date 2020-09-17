@@ -8,6 +8,9 @@ COPY bin/healthcheck /usr/bin/healthcheck
 
 RUN ["chmod", "+x", "/run.sh", "/usr/bin/healthcheck"]
 
+HEALTHCHECK --interval=30s --timeout=10s --retries=5 \
+  CMD ["/usr/bin/healthcheck"]
+
 COPY --from=ldez/traefik-certs-dumper:v2.7.0 /usr/bin/traefik-certs-dumper /usr/bin/traefik-certs-dumper
 
 VOLUME ["/traefik"]
