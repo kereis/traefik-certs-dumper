@@ -1,4 +1,4 @@
-FROM docker:19.03.8
+FROM docker:19.03.13
 LABEL maintainer="Humenius <contact@humenius.me>"
 
 RUN \
