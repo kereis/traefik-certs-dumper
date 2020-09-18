@@ -92,7 +92,7 @@ services:
 This Docker image does reports its health status.
 The process which monitors `run.sh` reports back `1` when it malfunctions and `0` when it is running inside docker container.
 Normally, it's embedded in the Dockerfile which means without further ado, this works out of the box. However, if you want to specify more than one health check, you can set them via `docker-compose`.
-```yaml:
+```yaml
 version: '3.7'
 
 services:
