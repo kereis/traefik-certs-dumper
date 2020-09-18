@@ -3,7 +3,7 @@
 [![Docker Layers](https://images.microbadger.com/badges/image/humenius/traefik-certs-dumper.svg)](https://hub.docker.com/r/humenius/traefik-certs-dumper)
 [![Docker Image Latest Version](https://images.microbadger.com/badges/version/humenius/traefik-certs-dumper:1.3.2.svg)](https://hub.docker.com/r/humenius/traefik-certs-dumper)
 
-Dumps Let's Encrypt certificates of a specified domain to `.pem` and `.key` files which Traefik stores in `acme.json`. 
+Dumps Let's Encrypt certificates of a specified domain to `.pem` and `.key` files which Traefik stores in `acme.json`.
 
 This image uses:
 - a bash script that derrivates from [mailu/traefik-certdumper](https://hub.docker.com/r/mailu/traefik-certdumper)
@@ -68,7 +68,7 @@ services:
 ```
 
 ### Extract multiple domains
-This Docker image is able to extract multiple domains as well. 
+This Docker image is able to extract multiple domains as well.
 Use environment variable `DOMAIN` and add you domains as a comma-separated list.
 After certificate dumping, the certificates can be found in the domains' subdirectories respectively.
 (`/output/DOMAIN[i]/...`)
