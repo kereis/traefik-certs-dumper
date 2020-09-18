@@ -1,5 +1,4 @@
 FROM ldez/traefik-certs-dumper:v2.7.0
-
 LABEL maintainer="Humenius <contact@humenius.me>"
 
 RUN \
@@ -9,10 +8,10 @@ RUN \
         util-linux \
         bash
 
-COPY run.sh /
+COPY bin/dump /usr/bin/dump
 COPY bin/healthcheck /usr/bin/healthcheck
 
-RUN ["chmod", "+x", "/run.sh", "/usr/bin/healthcheck"]
+RUN ["chmod", "+x", "/usr/bin/dump", "/usr/bin/healthcheck"]
 
 HEALTHCHECK --interval=30s --timeout=10s --retries=5 \
   CMD ["/usr/bin/healthcheck"]
@@ -20,4 +19,4 @@ HEALTHCHECK --interval=30s --timeout=10s --retries=5 \
 VOLUME ["/traefik"]
 VOLUME ["/output"]
 
-ENTRYPOINT ["/run.sh"]
+ENTRYPOINT ["/usr/bin/dump"]

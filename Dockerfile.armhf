@@ -1,5 +1,4 @@
 FROM ldez/traefik-certs-dumper:v2.7.0-arm.v7
-
 LABEL maintainer="Humenius <contact@humenius.me>"
 
 COPY --from=multiarch/qemu-user-static:x86_64-arm /usr/bin/qemu-arm-static /usr/bin/qemu-arm-static
@@ -11,11 +10,15 @@ RUN \
         util-linux \
         bash
 
-COPY run.sh /
+COPY bin/dump /usr/bin/dump
+COPY bin/healthcheck /usr/bin/healthcheck
 
-RUN ["chmod", "+x", "/run.sh"]
+RUN ["chmod", "+x", "/usr/bin/dump", "/usr/bin/healthcheck"]
+
+HEALTHCHECK --interval=30s --timeout=10s --retries=5 \
+  CMD ["/usr/bin/healthcheck"]
 
 VOLUME ["/traefik"]
 VOLUME ["/output"]
 
-ENTRYPOINT ["/run.sh"]
+ENTRYPOINT ["/usr/bin/dump"]
