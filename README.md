@@ -88,5 +88,30 @@ services:
       DOMAIN: example.com,example.org,example.net,hello.example.in
 ```
 
+### Health Check
+This Docker image does reports its health status.
+The process which monitors `run.sh` reports back `1` when it malfunctions and `0` when it is running inside docker container.
+Normally, it's embedded in the Dockerfile which means without further ado, this works out of the box. However, if you want to specify more than one health check, you can set them via `docker-compose`.
+```yaml:
+version: '3.7'
+
+services:
+  certdumper:
+    image: humenius/traefik-certs-dumper:latest
+    container_name: traefik_certdumper
+    volumes:
+    - ./traefik/acme:/traefik:ro
+    - ./output:/output:rw
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      DOMAIN: example.com,example.org,example.net,sub.domain.ext
+    healthcheck:
+      test: ["CMD", "/usr/bin/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+```
+
+
 ## Help!
 If you need help using this image, have suggestions or want to report a problem, feel free to open an issue on GitHub!
