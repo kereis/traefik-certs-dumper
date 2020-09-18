@@ -3,7 +3,7 @@ name: Build Docker images (with Docker)
 on:
   push:
     branches:
-      - master
+      - release
     tags:
       - 'v*'
 
