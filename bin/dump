@@ -88,7 +88,7 @@ change_ownership() {
 }
 
 restart_containers() {
-  if [ ! -z "${CONTAINERS#}" && -z "${_docker_available}" ]; then
+  if [ ! -z "${CONTAINERS#}" && "${_docker_available}" = true ]; then
     log "Trying to restart containers"
     
     for i in "${CONTAINERS[@]}"; do
@@ -126,14 +126,18 @@ log() {
 }
 
 check_docker_cmd() {
+  local __ret=$1
+
   [ -x "$(command -v docker)" ]
   local _result=$?
 
-  [ -z "$_docker_available" ] ||
-    log "Docker command is not available. Restart container functionality will not work!" &&
+  if (( $_result == 1 )); then
+    log "Docker command is not available. Restart container functionality will not work!"
     log "In case you need it, consider using the Docker version of this image."
-
-  ret="$_result"
+    unset __ret
+  else
+    eval $__ret=true
+  fi
 }
 
 ###############################################
@@ -202,9 +206,10 @@ parse_commandline() {
 
 parse_commandline "$@"
 
-_docker_available=$(check_docker_cmd)
+_docker_available=
+check_docker_cmd _docker_available
 
-if [ -z "${_docker_available}" ]; then
+if [ "${_docker_available}" = true ]; then
   if [ -z "${_arg_restart_containers}" ]; then
     log "--restart-containers is empty. Won't attempt to restart containers."
   else
