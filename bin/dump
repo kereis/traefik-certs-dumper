@@ -132,8 +132,8 @@ check_docker_cmd() {
   local _result=$?
 
   if (( $_result == 1 )); then
-    log "Docker command is not available. Restart container functionality will not work!"
-    log "In case you need it, consider using the Docker version of this image."
+
+
     unset __ret
   else
     eval $__ret=true
@@ -217,6 +217,10 @@ if [ "${_docker_available}" = true ]; then
     IFS=',' read -ra CONTAINERS <<< "$_arg_restart_containers"
     log "Values split! Got '${CONTAINERS[@]}'"
   fi
+else
+  log "Docker command is not available. Restart container functionality will not work!"
+  log "In case you need it, consider using the Docker version of this image."
+  log "(humenius/traefik-certs-dumper:docker)"
 fi
 
 if [ -z "${DOMAIN}" ]; then
