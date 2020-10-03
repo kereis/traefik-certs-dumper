@@ -1,4 +1,4 @@
-name: Build Docker images (alpine)
+name: Build Docker images
 
 on: push
 
