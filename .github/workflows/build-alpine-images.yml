@@ -1,0 +1,74 @@
+name: Build Docker images (alpine)
+
+on: push
+
+jobs:
+  build-images:
+    name: Build alpine image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to Docker Hub registry
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and publish image
+        uses: docker/build-push-action@v2
+        with:
+          context: ./alpine
+          file: ./Dockerfile
+          push: false
+          tags: humenius/traefik-certs-dumper:alpine-test
+  
+      - name: Build and publish image (arm32v7)
+        uses: docker/build-push-action@v2
+        with:
+          context: ./alpine
+          file: ./Dockerfile.armhf
+          platforms: linux/arm/v7
+          push: false
+          tags: humenius/traefik-certs-dumper:alpine-arm32v7-test
+
+      - name: Build and publish image (arm64v8)
+        uses: docker/build-push-action@v2
+        with:
+          context: ./alpine
+          file: ./Dockerfile.aarch64
+          platforms: linux/arm64
+          push: false
+          tags: humenius/traefik-certs-dumper:alpine-arm64v8-test
+
+  
+  publish-manifest:
+    name: Publish multiarch manifest
+    needs:
+      - build-images
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v1
+
+      - name: Login to Docker Hub registry
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Create and publish manifest list
+        uses: ./.github/actions/docker-create-manifest
+        env:
+          DOCKER_CLI_EXPERIMENTAL: enabled
+        with:
+          multiarch: '["amd64", "arm32v7", "arm64v8"]'

@@ -1,0 +1,25 @@
+FROM ldez/traefik-certs-dumper:v2.7.0-arm.v8
+LABEL maintainer="Humenius <contact@humenius.me>"
+
+COPY --from=multiarch/qemu-user-static:x86_64-aarch64 \
+      /usr/bin/qemu-aarch64-static /usr/bin/qemu-aarch64-static
+
+RUN \
+    apk update && \
+    apk add --no-cache \
+        inotify-tools \
+        util-linux \
+        bash
+
+COPY bin/dump /usr/bin/dump
+COPY bin/healthcheck /usr/bin/healthcheck
+
+RUN ["chmod", "+x", "/usr/bin/dump", "/usr/bin/healthcheck"]
+
+HEALTHCHECK --interval=30s --timeout=10s --retries=5 \
+  CMD ["/usr/bin/healthcheck"]
+
+VOLUME ["/traefik"]
+VOLUME ["/output"]
+
+ENTRYPOINT ["/run.sh"]
