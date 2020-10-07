@@ -1,0 +1,54 @@
+name: Test dev images (alpine)
+
+on:
+  push:
+    branches-ignore:
+      - master
+      #- develop
+      - 'release/**'
+  pull_request:
+    branches-ignore:
+      - master
+      #- develop
+      - 'release/**'
+      
+jobs:
+  test-build-images:
+    name: Test build image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./alpine/Dockerfile
+          push: false
+          tags: humenius/traefik-certs-dumper:$GITHUB_ACTOR-$GITHUB_SHA-alpine
+  
+      - name: Build image (arm32v7)
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./alpine/Dockerfile.armhf
+          platforms: linux/arm/v7
+          push: false
+          tags: humenius/traefik-certs-dumper:$GITHUB_ACTOR-$GITHUB_SHA-alpine-arm32v7
+
+      - name: Build image (arm64v8)
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./alpine/Dockerfile.aarch64
+          platforms: linux/arm64/v8
+          push: false
+          tags: humenius/traefik-certs-dumper:$GITHUB_ACTOR-$GITHUB_SHA-alpine-arm64v8
