@@ -60,6 +60,7 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache
           tags: |
             humenius/traefik-certs-dumper:alpine
+            humenius/traefik-certs-dumper:${{ steps.prep.outputs.version }}-alpine
             humenius/traefik-certs-dumper:${{ steps.prep.outputs.minor }}-alpine
             humenius/traefik-certs-dumper:${{ steps.prep.outputs.major }}-alpine
           labels: |
@@ -83,6 +84,7 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache
           tags: |
             humenius/traefik-certs-dumper:arm32v7-alpine
+            humenius/traefik-certs-dumper:${{ steps.prep.outputs.version }}-arm32v7-alpine
             humenius/traefik-certs-dumper:${{ steps.prep.outputs.minor }}-arm32v7-alpine
             humenius/traefik-certs-dumper:${{ steps.prep.outputs.major }}-arm32v7-alpine
           labels: |
@@ -106,6 +108,7 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache
           tags: |
             humenius/traefik-certs-dumper:arm64v8-alpine
+            humenius/traefik-certs-dumper:${{ steps.prep.outputs.version }}-arm64v8-alpine
             humenius/traefik-certs-dumper:${{ steps.prep.outputs.minor }}-arm64v8-alpine
             humenius/traefik-certs-dumper:${{ steps.prep.outputs.major }}-arm64v8-alpine
           labels: |
