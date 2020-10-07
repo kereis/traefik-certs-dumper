@@ -1,6 +1,11 @@
 name: Build and publish Docker images (alpine)
 
-on: push
+on:
+  push:
+    branches:
+      - 'release/**'
+    tags:
+      - 'v*'
 
 jobs:
   build-and-publish-images:
