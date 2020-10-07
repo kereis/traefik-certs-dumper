@@ -41,6 +41,8 @@ jobs:
           context: .
           file: ./alpine/Dockerfile
           push: false
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
           tags: humenius/traefik-certs-dumper:${{ github.actor }}-${{ github.sha }}-alpine-dev
   
       - name: Build image (arm32v7)
@@ -50,6 +52,8 @@ jobs:
           file: ./alpine/Dockerfile.armhf
           platforms: linux/arm/v7
           push: false
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
           tags: humenius/traefik-certs-dumper:${{ github.actor }}-${{ github.sha }}-alpine-arm32v7-dev
 
       - name: Build image (arm64v8)
@@ -59,4 +63,6 @@ jobs:
           file: ./alpine/Dockerfile.aarch64
           platforms: linux/arm64/v8
           push: false
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
           tags: humenius/traefik-certs-dumper:${{ github.actor }}-${{ github.sha }}-alpine-arm64v8-dev

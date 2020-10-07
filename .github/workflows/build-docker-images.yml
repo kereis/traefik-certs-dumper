@@ -54,6 +54,8 @@ jobs:
           context: .
           file: ./docker/Dockerfile
           push: true
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
           tags: |
             humenius/traefik-certs-dumper:latest
             humenius/traefik-certs-dumper:${{ steps.prep.outputs.minor }}
@@ -75,6 +77,8 @@ jobs:
           file: ./docker/Dockerfile.armhf
           platforms: linux/arm/v7
           push: true
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
           tags: |
             humenius/traefik-certs-dumper:arm32v7
             humenius/traefik-certs-dumper:${{ steps.prep.outputs.minor }}-arm32v7
@@ -96,6 +100,8 @@ jobs:
           file: ./docker/Dockerfile.aarch64
           platforms: linux/arm64/v8
           push: true
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
           tags: |
             humenius/traefik-certs-dumper:arm64v8
             humenius/traefik-certs-dumper:${{ steps.prep.outputs.minor }}-arm64v8
