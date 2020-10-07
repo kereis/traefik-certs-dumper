@@ -33,7 +33,7 @@ jobs:
           context: .
           file: ./docker/Dockerfile
           push: false
-          tags: humenius/traefik-certs-dumper:${{ env.GITHUB_ACTOR }}-${{ env.GITHUB_SHA }}-dev
+          tags: humenius/traefik-certs-dumper:${{ github.actor }}-${{ github.sha }}-dev
   
       - name: Build image (arm32v7)
         uses: docker/build-push-action@v2
@@ -42,7 +42,7 @@ jobs:
           file: ./docker/Dockerfile.armhf
           platforms: linux/arm/v7
           push: false
-          tags: humenius/traefik-certs-dumper:${{ env.GITHUB_ACTOR }}-${{ env.GITHUB_SHA }}-arm32v7
+          tags: humenius/traefik-certs-dumper:${{ github.actor }}-${{ github.sha }}-arm32v7-dev
 
       - name: Build image (arm64v8)
         uses: docker/build-push-action@v2
@@ -51,4 +51,4 @@ jobs:
           file: ./docker/Dockerfile.aarch64
           platforms: linux/arm64/v8
           push: false
-          tags: humenius/traefik-certs-dumper:${{ env.GITHUB_ACTOR }}-${{ env.GITHUB_SHA }}-arm64v8
+          tags: humenius/traefik-certs-dumper:${{ github.actor }}-${{ github.sha }}-arm64v8-dev
