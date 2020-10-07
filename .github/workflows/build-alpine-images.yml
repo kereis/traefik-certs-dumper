@@ -26,16 +26,16 @@ jobs:
       - name: Build and publish image
         uses: docker/build-push-action@v2
         with:
-          context: ./alpine
-          file: ./Dockerfile
+          context: .
+          file: ./alpine/Dockerfile
           push: false
           tags: humenius/traefik-certs-dumper:alpine-test
   
       - name: Build and publish image (arm32v7)
         uses: docker/build-push-action@v2
         with:
-          context: ./alpine
-          file: ./Dockerfile.armhf
+          context: .
+          file: ./alpine/Dockerfile.armhf
           platforms: linux/arm/v7
           push: false
           tags: humenius/traefik-certs-dumper:alpine-arm32v7-test
@@ -43,13 +43,12 @@ jobs:
       - name: Build and publish image (arm64v8)
         uses: docker/build-push-action@v2
         with:
-          context: ./alpine
-          file: ./Dockerfile.aarch64
+          context: .
+          file: ./alpine/Dockerfile.aarch64
           platforms: linux/arm64
           push: false
           tags: humenius/traefik-certs-dumper:alpine-arm64v8-test
-
-  
+            
   publish-manifest:
     name: Publish multiarch manifest
     needs:
