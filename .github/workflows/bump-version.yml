@@ -1,9 +1,9 @@
 name: Bump version
 
-on: push
-#  push:
-#    branches:
-#      - 'release/**'
+on:
+  push:
+    branches:
+      - 'release/**'
       
 jobs:
   build:
@@ -19,6 +19,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         WITH_V: true
-        DRY_RUN: true
-        RELEASE_BRANCHES: release.*,feature.*
-        #DEFAULT_BUMP: none
+        DRY_RUN: false
+        RELEASE_BRANCHES: release.*
+        DEFAULT_BUMP: none
