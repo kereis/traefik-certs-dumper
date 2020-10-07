@@ -1,9 +1,9 @@
-name: Build Docker images (alpine)
+name: Build and publish Docker images (alpine)
 
 on: push
 
 jobs:
-  build-images:
+  build-and-publish-images:
     name: Build alpine image
     runs-on: ubuntu-latest
 
@@ -28,7 +28,7 @@ jobs:
         with:
           context: .
           file: ./alpine/Dockerfile
-          push: false
+          push: true
           tags: humenius/traefik-certs-dumper:alpine-test
   
       - name: Build and publish image (arm32v7)
@@ -37,7 +37,7 @@ jobs:
           context: .
           file: ./alpine/Dockerfile.armhf
           platforms: linux/arm/v7
-          push: false
+          push: true
           tags: humenius/traefik-certs-dumper:alpine-arm32v7-test
 
       - name: Build and publish image (arm64v8)
@@ -46,28 +46,5 @@ jobs:
           context: .
           file: ./alpine/Dockerfile.aarch64
           platforms: linux/arm64
-          push: false
+          push: true
           tags: humenius/traefik-certs-dumper:alpine-arm64v8-test
-            
-  publish-manifest:
-    name: Publish multiarch manifest
-    needs:
-      - build-images
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v1
-
-      - name: Login to Docker Hub registry
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Create and publish manifest list
-        uses: ./.github/actions/docker-create-manifest
-        env:
-          DOCKER_CLI_EXPERIMENTAL: enabled
-        with:
-          multiarch: '["amd64", "arm32v7", "arm64v8"]'
