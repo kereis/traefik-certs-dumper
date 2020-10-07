@@ -20,5 +20,5 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         WITH_V: true
         DRY_RUN: true
-        RELEASE_BRANCHES: release.*
-        DEFAULT_BUMP: none
+        RELEASE_BRANCHES: release.*,feature.*
+        #DEFAULT_BUMP: none
