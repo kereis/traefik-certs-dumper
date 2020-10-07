@@ -33,7 +33,7 @@ jobs:
           context: .
           file: ./alpine/Dockerfile
           push: false
-          tags: humenius/traefik-certs-dumper:$GITHUB_ACTOR-$GITHUB_SHA-alpine
+          tags: humenius/traefik-certs-dumper:${{ env.GITHUB_ACTOR }}-${{ env.GITHUB_SHA }}-alpine
   
       - name: Build image (arm32v7)
         uses: docker/build-push-action@v2
@@ -42,7 +42,7 @@ jobs:
           file: ./alpine/Dockerfile.armhf
           platforms: linux/arm/v7
           push: false
-          tags: humenius/traefik-certs-dumper:$GITHUB_ACTOR-$GITHUB_SHA-alpine-arm32v7
+          tags: humenius/traefik-certs-dumper:${{ env.GITHUB_ACTOR }}-${{ env.GITHUB_SHA }}-alpine-arm32v7
 
       - name: Build image (arm64v8)
         uses: docker/build-push-action@v2
@@ -51,4 +51,4 @@ jobs:
           file: ./alpine/Dockerfile.aarch64
           platforms: linux/arm64/v8
           push: false
-          tags: humenius/traefik-certs-dumper:$GITHUB_ACTOR-$GITHUB_SHA-alpine-arm64v8
+          tags: humenius/traefik-certs-dumper:${{ env.GITHUB_ACTOR }}-${{ env.GITHUB_SHA }}-alpine-arm64v8
