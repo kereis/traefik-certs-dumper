@@ -1,7 +1,0 @@
-name: docker-create-manifest
-inputs:
-  multiarch:
-    required: true
-runs:
-  using: node12
-  main: index.js
