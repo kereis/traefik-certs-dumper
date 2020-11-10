@@ -55,7 +55,7 @@ jobs:
         with:
           context: .
           file: ./alpine/Dockerfile
-          push: true
+          push: false
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
           tags: |
@@ -79,7 +79,7 @@ jobs:
           context: .
           file: ./alpine/Dockerfile.armhf
           platforms: linux/arm/v7
-          push: true
+          push: false
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
           tags: |
@@ -103,7 +103,7 @@ jobs:
           context: .
           file: ./alpine/Dockerfile.aarch64
           platforms: linux/arm64/v8
-          push: true
+          push: false
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
           tags: |

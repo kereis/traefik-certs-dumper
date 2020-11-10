@@ -20,6 +20,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         WITH_V: true
-        DRY_RUN: false
+        DRY_RUN: true
         RELEASE_BRANCHES: release.*
         DEFAULT_BUMP: none
