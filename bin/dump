@@ -88,7 +88,7 @@ change_ownership() {
 }
 
 restart_containers() {
-  if [ ! -z "${CONTAINERS#}" ]; then
+  if [ ! -z "${CONTAINERS#}" && "${_docker_available}" = true ]; then
     log "Trying to restart containers"
     
     for i in "${CONTAINERS[@]}"; do
@@ -123,6 +123,21 @@ err() {
 
 log() {
   echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')]: $*"
+}
+
+check_docker_cmd() {
+  local __ret=$1
+
+  [ -x "$(command -v docker)" ]
+  local _result=$?
+
+  if (( $_result == 1 )); then
+
+
+    unset __ret
+  else
+    eval $__ret=true
+  fi
 }
 
 ###############################################
@@ -191,12 +206,21 @@ parse_commandline() {
 
 parse_commandline "$@"
 
-if [ -z "${_arg_restart_containers}" ]; then
-  log "--restart-containers is empty. Won't attempt to restart containers."
+_docker_available=
+check_docker_cmd _docker_available
+
+if [ "${_docker_available}" = true ]; then
+  if [ -z "${_arg_restart_containers}" ]; then
+    log "--restart-containers is empty. Won't attempt to restart containers."
+  else
+    log "Got value of --restart-containers: ${_arg_restart_containers}. Splitting values."
+    IFS=',' read -ra CONTAINERS <<< "$_arg_restart_containers"
+    log "Values split! Got '${CONTAINERS[@]}'"
+  fi
 else
-  log "Got value of --restart-containers: ${_arg_restart_containers}. Splitting values."
-  IFS=',' read -ra CONTAINERS <<< "$_arg_restart_containers"
-  log "Values split! Got '${CONTAINERS[@]}'"
+  log "Docker command is not available. Restart container functionality will not work!"
+  log "In case you need it, consider using the Docker version of this image."
+  log "(humenius/traefik-certs-dumper:docker)"
 fi
 
 if [ -z "${DOMAIN}" ]; then
