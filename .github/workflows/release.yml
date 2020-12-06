@@ -2,8 +2,6 @@ name: Release Docker image
 
 on:
   push:
-    # branches:
-    #   - 'release/**'
     tags:
       - 'v*'
 
@@ -83,8 +81,6 @@ jobs:
           file: ./alpine/Dockerfile
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-          # push: ${{ github.event_name != 'pull_request' }}
-          push: false
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
   
@@ -96,8 +92,6 @@ jobs:
           platforms: linux/arm/v7
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-          # push: ${{ github.event_name != 'pull_request' }}
-          push: false
           tags: ${{ steps.docker_meta_arm32v7.outputs.tags }}
           labels: ${{ steps.docker_meta_arm32v7.outputs.labels }}
 
@@ -109,8 +103,6 @@ jobs:
           platforms: linux/arm64/v8
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-          # push: ${{ github.event_name != 'pull_request' }}
-          push: false
           tags: ${{ steps.docker_meta_arm64v8.outputs.tags }}
           labels: ${{ steps.docker_meta_arm64v8.outputs.labels }}
 
@@ -189,8 +181,6 @@ jobs:
           file: ./alpine/Dockerfile
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-          # push: ${{ github.event_name != 'pull_request' }}
-          push: false
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
   
@@ -202,8 +192,6 @@ jobs:
           platforms: linux/arm/v7
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-          # push: ${{ github.event_name != 'pull_request' }}
-          push: false
           tags: ${{ steps.docker_meta_arm32v7.outputs.tags }}
           labels: ${{ steps.docker_meta_arm32v7.outputs.labels }}
 
@@ -215,7 +203,5 @@ jobs:
           platforms: linux/arm64/v8
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-          # push: ${{ github.event_name != 'pull_request' }}
-          push: false
           tags: ${{ steps.docker_meta_arm64v8.outputs.tags }}
           labels: ${{ steps.docker_meta_arm64v8.outputs.labels }}

@@ -3,13 +3,9 @@ name: Build dev images
 on:
   push:
     branches-ignore:
-      #- master
-      #- develop
       - 'release/**'
   pull_request:
     branches-ignore:
-      #- master
-      #- develop
       - 'release/**'
 
 env:
