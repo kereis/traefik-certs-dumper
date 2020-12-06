@@ -25,9 +25,9 @@ jobs:
         with:
           images: ${{ env.DOCKER_IMAGE }}
           tag-semver: |
-            {{version}}-alpine
-            {{major}}.{{minor}}-alpine
-            {{major}}-alpine
+            {{version}}
+            {{major}}.{{minor}}
+            {{major}}
           tag-custom: |
             alpine
           tag-latest: false
