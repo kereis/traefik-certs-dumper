@@ -12,8 +12,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      with:
-        fetch-depth: '0'
 
     - name: Bump version and push tag
       uses: anothrNick/github-tag-action@1.26.0
