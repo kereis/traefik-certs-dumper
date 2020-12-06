@@ -42,6 +42,7 @@ jobs:
             {{major}}-arm32v7
           tag-custom: |
             arm32v7
+          tag-latest: false
 
       - name: Prepare tags for arm64v8 build
         id: docker_meta_arm64v8
@@ -55,6 +56,7 @@ jobs:
             {{major}}-arm64v8
           tag-custom: |
             arm64v8
+          tag-latest: false
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
