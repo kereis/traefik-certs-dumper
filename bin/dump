@@ -94,7 +94,7 @@ restart_containers() {
     for i in "${CONTAINERS[@]}"; do
       log "Looking up container with name ${i}"
 
-      local found_container=$(docker ps -qaf name="${i}")
+      local found_container=$(docker container inspect -f {{.Id}} "${i}" || echo "")
       if [ ! -z "${found_container}" ]; then
         log "Found '${found_container}'. Restarting now..."
 
