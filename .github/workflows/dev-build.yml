@@ -3,12 +3,12 @@ name: Build dev images
 on:
   push:
     branches-ignore:
-      - master
+      #- master
       #- develop
       - 'release/**'
   pull_request:
     branches-ignore:
-      - master
+      #- master
       #- develop
       - 'release/**'
 
@@ -31,7 +31,7 @@ jobs:
           images: ${{ env.DOCKER_IMAGE }}
           tag-sha: true
           tag-semver: |
-            {{version}}-dev
+            {{raw}}-dev
           tag-latest: false
 
       - name: Prepare tags for arm32v7 build
@@ -39,9 +39,8 @@ jobs:
         uses: crazy-max/ghaction-docker-meta@v1
         with:
           images: ${{ env.DOCKER_IMAGE }}
-          tag-sha: true
           tag-semver: |
-            {{version}}-arm32v7-dev
+            {{raw}}-arm32v7-dev
           tag-latest: false
 
       - name: Prepare tags for arm64v8 build
@@ -49,9 +48,8 @@ jobs:
         uses: crazy-max/ghaction-docker-meta@v1
         with:
           images: ${{ env.DOCKER_IMAGE }}
-          tag-sha: true
           tag-semver: |
-            {{version}}-arm64v8-dev
+            {{raw}}-arm64v8-dev
           tag-latest: false
 
       - name: Set up QEMU
@@ -125,9 +123,8 @@ jobs:
         uses: crazy-max/ghaction-docker-meta@v1
         with:
           images: ${{ env.DOCKER_IMAGE }}
-          tag-sha: true
           tag-semver: |
-            {{version}}-alpine-dev
+            {{raw}}-alpine-dev
           tag-latest: false
 
       - name: Prepare tags for arm32v7 build
@@ -135,9 +132,8 @@ jobs:
         uses: crazy-max/ghaction-docker-meta@v1
         with:
           images: ${{ env.DOCKER_IMAGE }}
-          tag-sha: true
           tag-semver: |
-            {{version}}-arm32v7-alpine-dev
+            {{raw}}-arm32v7-alpine-dev
           tag-latest: false
 
       - name: Prepare tags for arm64v8 build
@@ -145,9 +141,8 @@ jobs:
         uses: crazy-max/ghaction-docker-meta@v1
         with:
           images: ${{ env.DOCKER_IMAGE }}
-          tag-sha: true
           tag-semver: |
-            {{version}}-arm64v8-alpine-dev
+            {{raw}}-arm64v8-alpine-dev
           tag-latest: false
 
       - name: Set up QEMU

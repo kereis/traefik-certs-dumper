@@ -2,8 +2,8 @@ name: Release Docker image
 
 on:
   push:
-    branches:
-      - 'release/**'
+    # branches:
+    #   - 'release/**'
     tags:
       - 'v*'
 
@@ -35,7 +35,6 @@ jobs:
         uses: crazy-max/ghaction-docker-meta@v1
         with:
           images: ${{ env.DOCKER_IMAGE }}
-          tag-sha: true
           tag-semver: |
             {{version}}-arm32v7
             {{major}}.{{minor}}-arm32v7
@@ -49,7 +48,6 @@ jobs:
         uses: crazy-max/ghaction-docker-meta@v1
         with:
           images: ${{ env.DOCKER_IMAGE }}
-          tag-sha: true
           tag-semver: |
             {{version}}-arm64v8
             {{major}}.{{minor}}-arm64v8
@@ -129,7 +127,6 @@ jobs:
         uses: crazy-max/ghaction-docker-meta@v1
         with:
           images: ${{ env.DOCKER_IMAGE }}
-          tag-sha: true
           tag-semver: |
             {{version}}-alpine
             {{major}}.{{minor}}-alpine
@@ -144,7 +141,6 @@ jobs:
         uses: crazy-max/ghaction-docker-meta@v1
         with:
           images: ${{ env.DOCKER_IMAGE }}
-          tag-sha: true
           tag-semver: |
             {{version}}-arm32v7-alpine
             {{major}}.{{minor}}-arm32v7-alpine
@@ -158,7 +154,6 @@ jobs:
         uses: crazy-max/ghaction-docker-meta@v1
         with:
           images: ${{ env.DOCKER_IMAGE }}
-          tag-sha: true
           tag-semver: |
             {{version}}-arm64v8-alpine
             {{major}}.{{minor}}-arm64v8-alpine
