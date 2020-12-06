@@ -1,11 +1,11 @@
 name: Build and publish Docker images (alpine)
 
 on:
-  push:
-    branches:
-      - 'release/**'
-    tags:
-      - 'v*'
+  push
+    # branches:
+    #   - 'release/**'
+    # tags:
+    #   - 'v*'
 
 env:
   DOCKER_IMAGE: humenius/traefik-certs-dumper
