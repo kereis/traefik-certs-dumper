@@ -58,6 +58,7 @@ dump() {
         mv ${workdir}/${DOMAINS[0]}/*.pem ${outputdir}/
         change_ownership
         restart_containers
+        restart_services
       fi
     else
       err "Certificates for domain '${DOMAINS[0]}' don't exist. Omitting..."
@@ -117,6 +118,36 @@ restart_containers() {
   fi
 }
 
+restart_services() {
+  if [ ! -z "${SERVICES#}" && "${_docker_available}" = true ]; then
+    log "Trying to restart services"
+    
+    for i in "${SERVICES[@]}"; do
+      log "Looking up service with name ${i}"
+
+      local found_service=$(docker service inspect -f {{.ID}} "${i}" || echo "")
+      if [ ! -z "${found_service}" ]; then
+        log "Found '${found_service}'. Running force update now..."
+
+        docker service update --force ${found_service}
+
+        if [ $? -eq 0 ]; then
+          log "Restarting service '${found_service}' was successful"
+        else
+          err "
+          Something went wrong while restarting '${found_service}'
+          Please check health of services and their tasks and consider restarting them manually.
+          "
+        fi
+      else
+        err "Service '${i}' could not be found. Omitting service..."
+      fi
+    done
+
+    log "Service restarting process done."
+  fi
+}
+
 err() {
   echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')]: $*" >&2
 }
@@ -159,13 +190,16 @@ begins_with_short_option() {
 }
 
 _arg_restart_containers=
+_arg_restart_services=
+SERVICES=
 CONTAINERS=
 DOMAINS=
 
 print_help() {
   printf '%s\n' "traefik-certs-dumper bash script by Humenius <contact@humenius.me>"
-  printf 'Usage: %s [-r|--restart-containers <arg>] [-h|--help]\n' "$0"
+  printf 'Usage: %s [-r|--restart-containers <arg>] [--restart-services <arg>] [-h|--help]\n' "$0"
   printf '\t%s\n' "-r, --restart-containers: Restart containers passed as comma-separated container names (no default)"
+  printf '\t%s\n' "-r, --restart-services: Restart docker services (force-update) passed as comma-separated service names (no default)"
   printf '\t%s\n' "-h, --help: Prints help"
   printf 'Environment variables:\n'
   printf '\t%s\n' "DOMAIN: Domains whose certificates will be extracted"
@@ -185,6 +219,9 @@ parse_commandline() {
       ;;
     -r*)
       _arg_restart_containers="${_key##-r}"
+      ;;
+    --restart-services=*)
+      _arg_restart_services="${_key##--restart-services=}"
       ;;
     -h | --help)
       print_help
@@ -217,10 +254,17 @@ if [ "${_docker_available}" = true ]; then
     IFS=',' read -ra CONTAINERS <<< "$_arg_restart_containers"
     log "Values split! Got '${CONTAINERS[@]}'"
   fi
+  if [ -z "${_arg_restart_services}" ]; then
+    log "--restart-services is empty. Won't attempt to restart services."
+  else
+    log "Got value of --restart-services: ${_arg_restart_services}. Splitting values."
+    IFS=',' read -ra SERVICES <<< "$_arg_restart_services"
+    log "Values split! Got '${SERVICES[@]}'"
+  fi
 else
   log "Docker command is not available. Restart container functionality will not work!"
   log "In case you need it, consider using the Docker version of this image."
-  log "(humenius/traefik-certs-dumper:docker)"
+  log "(e.g.: humenius/traefik-certs-dumper:latest)"
 fi
 
 if [ -z "${DOMAIN}" ]; then
