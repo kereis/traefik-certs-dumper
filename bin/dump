@@ -56,12 +56,36 @@ dump() {
       else
         log "Certificate or key for '${DOMAINS[0]}' differ, updating"
         mv ${workdir}/${DOMAINS[0]}/*.pem ${outputdir}/
+        combine_pem
         change_ownership
         restart_containers
         restart_services
       fi
     else
       err "Certificates for domain '${DOMAINS[0]}' don't exist. Omitting..."
+    fi
+  fi
+}
+
+combine_pem() {
+  if [[ -n "${COMBINED_PEM}" ]]; then
+    if [[ ! "${COMBINED_PEM}" = *\.pem ]]; then
+      #Check if combined_pem filename does have .pem at end of filename
+      log "COMBINED_PEM=${COMBINED_PEM} does not have .pem at end of filename."
+    else
+      if [ "${#DOMAINS[@]}" -gt 1 ]; then
+        for i in "${DOMAINS[@]}" ; do
+          if [[ -f ${outputdir}/${i}/cert.pem && -f ${outputdir}/${i}/key.pem ]]; then
+            log "Combining key and cert for domain ${i} to single pem with name ${i}/${COMBINED_PEM}"
+            cat ${outputdir}/"${i}"/cert.pem ${outputdir}/"${i}"/key.pem > ${outputdir}/"${i}"/"${COMBINED_PEM}"
+          fi
+        done
+      else
+        if [[ -f ${outputdir}/cert.pem && -f ${outputdir}/key.pem ]]; then
+          log "Combining key and cert to single pem with name ${COMBINED_PEM}"
+          cat ${outputdir}/cert.pem ${outputdir}/key.pem > ${outputdir}/"${COMBINED_PEM}"
+        fi
+      fi
     fi
   fi
 }
