@@ -73,7 +73,7 @@ combine_pem() {
       #Check if combined_pem filename does have .pem at end of filename
       log "COMBINED_PEM=${COMBINED_PEM} does not have .pem at end of filename."
     else
-      if [ "${#DOMAINS[@]}" -gt 1 ]; then
+      if [[ "${#DOMAINS[@]}" -gt 1 ]]; then
         for i in "${DOMAINS[@]}" ; do
           if [[ -f ${outputdir}/${i}/cert.pem && -f ${outputdir}/${i}/key.pem ]]; then
             log "Combining key and cert for domain ${i} to single pem with name ${i}/${COMBINED_PEM}"
@@ -113,7 +113,7 @@ change_ownership() {
 }
 
 restart_containers() {
-  if [ ! -z "${CONTAINERS#}" ] && [ "${_docker_available}" = true ]; then
+  if [[ ! -z "${CONTAINERS#}" && "${_docker_available}" = true ]]; then
     log "Trying to restart containers"
 
     for i in "${CONTAINERS[@]}"; do
@@ -143,7 +143,7 @@ restart_containers() {
 }
 
 restart_services() {
-  if [ ! -z "${SERVICES#}" ] && [ "${_docker_available}" = true ]; then
+  if [[ ! -z "${SERVICES#}" && "${_docker_available}" = true ]]; then
     log "Trying to restart services"
 
     for i in "${SERVICES[@]}"; do
@@ -183,7 +183,7 @@ log() {
 check_docker_cmd() {
   local __ret=$1
 
-  [ -x "$(command -v docker)" ]
+  [[ -x "$(command -v docker)" ]]
   local _result=$?
 
   if (( $_result == 1 )); then
