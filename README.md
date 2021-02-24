@@ -19,6 +19,18 @@ Special thanks to them!
 
 **IMPORTANT**: It's supposed to work with Traefik **v2** or higher! If you want to use this certificate dumper with **v1**, you can simply change the image to [mailu/traefik-certdumper](https://hub.docker.com/r/mailu/traefik-certdumper).
 
+## Table Of Content
+* [Usage](#usage)
+  + [Image choice](#image-choice)
+    - [`alpine` notes!](#-alpine--notes-)
+  + [Basic setup](#basic-setup)
+  + [Automatic container restart](#automatic-container-restart)
+  + [Change ownership of certificate and key files](#change-ownership-of-certificate-and-key-files)
+  + [Extract multiple domains](#extract-multiple-domains)
+  + [Health Check](#health-check)
+  + [Merging private key and public certificate in one .pem](#merging-private-key-and-public-certificate-in-one-pem)
+* [Help!](#help-)
+
 ## Usage
 ### Image choice
 We ship various flavors of this image - multi-arch, Docker (default) and Alpine. The versioning follows [SemVer](https://semver.org/).
