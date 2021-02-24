@@ -62,7 +62,7 @@ dump() {
         log "Certificate and key for '${DOMAINS[0]}' still up to date, doing nothing"
       else
         log "Certificate or key for '${DOMAINS[0]}' differ, updating"
-        mv ${workdir}/${DOMAINS[0]}/*.pem ${outputdir}/
+        mv "${workdir}/${DOMAINS[0]}/*.pem" "${outputdir}/"
         combine_pem
         change_ownership
         restart_containers
@@ -193,7 +193,7 @@ check_docker_cmd() {
   [[ -x "$(command -v docker)" ]]
   local _result=$?
 
-  if (( $_result == 1 )); then
+  if (( _result == 1 )); then
 
 
     unset __ret
