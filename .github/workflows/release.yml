@@ -4,8 +4,7 @@ on:
   release:
     types: [created]
   push:
-    tags:
-      - 'v*'
+    branches : [release/*]
 
 env:
   DOCKER_IMAGE: humenius/traefik-certs-dumper
