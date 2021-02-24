@@ -24,38 +24,45 @@ dump() {
     --source /traefik/acme.json >/dev/null
 
   if [[ "${#DOMAINS[@]}" -gt 1 ]]; then
+    local diff_available=false
     for i in "${DOMAINS[@]}" ; do
       if
         [[ -f ${workdir}/${i}/cert.pem && -f ${workdir}/${i}/key.pem ]]
       then
         if [[ -f ${outputdir}/${i}/cert.pem && -f ${outputdir}/${i}/key.pem ]] && \
-           diff -q ${workdir}/$i/cert.pem ${outputdir}/$i/cert.pem >/dev/null && \
-           diff -q ${workdir}/$i/key.pem ${outputdir}/$i/key.pem >/dev/null
+           diff -q "${workdir}/$i/cert.pem" "${outputdir}/$i/cert.pem" >/dev/null && \
+           diff -q "${workdir}/$i/key.pem" "${outputdir}/$i/key.pem" >/dev/null
         then
           log "Certificate and key for '${i}' still up to date, doing nothing"
         else
           log "Certificate or key for '${i}' differ, updating"
+          diff_available=true
           local dir=${outputdir}/${i}
-          mkdir -p ${dir} && mv ${workdir}/${i}/*.pem ${dir}
-          change_ownership
-          restart_containers
+          mkdir -p "${dir}" && mv "${workdir}/${i}/*.pem" "${dir}"
         fi
       else
         err "Certificates for domain '${i}' don't exist. Omitting..."
       fi
     done
+
+    if [[ "${diff_available}" = true ]]; then
+      combine_pem
+      change_ownership
+      restart_containers
+      restart_services
+    fi
   else
     if
       [[ -f ${workdir}/${DOMAINS[0]}/cert.pem && -f ${workdir}/${DOMAINS[0]}/key.pem ]]
     then
       if [[ -f ${outputdir}/cert.pem && -f ${outputdir}/key.pem ]] && \
-         diff -q ${workdir}/${DOMAINS[0]}/cert.pem ${outputdir}/cert.pem >/dev/null && \
-         diff -q ${workdir}/${DOMAINS[0]}/key.pem ${outputdir}/key.pem >/dev/null
+         diff -q "${workdir}/${DOMAINS[0]}/cert.pem" "${outputdir}/cert.pem" >/dev/null && \
+         diff -q "${workdir}/${DOMAINS[0]}/key.pem" "${outputdir}/key.pem" >/dev/null
       then
         log "Certificate and key for '${DOMAINS[0]}' still up to date, doing nothing"
       else
         log "Certificate or key for '${DOMAINS[0]}' differ, updating"
-        mv ${workdir}/${DOMAINS[0]}/*.pem ${outputdir}/
+        mv "${workdir}/${DOMAINS[0]}/*.pem" "${outputdir}/"
         combine_pem
         change_ownership
         restart_containers
@@ -123,7 +130,7 @@ restart_containers() {
       if [[ ! -z "${found_container}" ]]; then
         log "Found '${found_container}'. Restarting now..."
 
-        docker restart ${found_container}
+        docker restart "${found_container}"
 
         if [[ $? -eq 0 ]]; then
           log "Restarting container '${found_container}' was successful"
@@ -153,7 +160,7 @@ restart_services() {
       if [[ ! -z "${found_service}" ]]; then
         log "Found '${found_service}'. Running force update now..."
 
-        docker service update --force ${found_service}
+        docker service update --force "${found_service}"
 
         if [[ $? -eq 0 ]]; then
           log "Restarting service '${found_service}' was successful"
@@ -186,12 +193,12 @@ check_docker_cmd() {
   [[ -x "$(command -v docker)" ]]
   local _result=$?
 
-  if (( $_result == 1 )); then
+  if (( _result == 1 )); then
 
 
     unset __ret
   else
-    eval $__ret=true
+    eval "$__ret=true"
   fi
 }
 

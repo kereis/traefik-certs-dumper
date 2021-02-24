@@ -7,6 +7,8 @@
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/humenius/traefik-certs-dumper/build-docker-images?label=Docker%20build&logo=github)
 ![GitHub Workflow Status (Alpine)](https://img.shields.io/github/workflow/status/humenius/traefik-certs-dumper/build-alpine-images?label=Alpine%20build&logo=github)
 
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/e448ef74f4c9456dae00d75914499990)](https://www.codacy.com/gh/humenius/traefik-certs-dumper/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=humenius/traefik-certs-dumper&amp;utm_campaign=Badge_Grade)
+
 Dumps Let's Encrypt certificates of a specified domain to `.pem` and `.key` files which Traefik stores in `acme.json`.
 
 This image uses:
@@ -16,6 +18,18 @@ This image uses:
 Special thanks to them!
 
 **IMPORTANT**: It's supposed to work with Traefik **v2** or higher! If you want to use this certificate dumper with **v1**, you can simply change the image to [mailu/traefik-certdumper](https://hub.docker.com/r/mailu/traefik-certdumper).
+
+## Table Of Content
+* [Usage](#usage)
+  + [Image choice](#image-choice)
+    - [`alpine` notes!](#-alpine--notes-)
+  + [Basic setup](#basic-setup)
+  + [Automatic container restart](#automatic-container-restart)
+  + [Change ownership of certificate and key files](#change-ownership-of-certificate-and-key-files)
+  + [Extract multiple domains](#extract-multiple-domains)
+  + [Health Check](#health-check)
+  + [Merging private key and public certificate in one .pem](#merging-private-key-and-public-certificate-in-one-pem)
+* [Help!](#help-)
 
 ## Usage
 ### Image choice

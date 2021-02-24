@@ -11,8 +11,8 @@ RUN \
         util-linux \
         bash
 
-COPY bin/dump /usr/bin/dump
-COPY bin/healthcheck /usr/bin/healthcheck
+COPY bin/dump.sh /usr/bin/dump
+COPY bin/healthcheck.sh /usr/bin/healthcheck
 
 RUN ["chmod", "+x", "/usr/bin/dump", "/usr/bin/healthcheck"]
 
