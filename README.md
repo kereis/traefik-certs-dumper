@@ -7,6 +7,8 @@
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/humenius/traefik-certs-dumper/build-docker-images?label=Docker%20build&logo=github)
 ![GitHub Workflow Status (Alpine)](https://img.shields.io/github/workflow/status/humenius/traefik-certs-dumper/build-alpine-images?label=Alpine%20build&logo=github)
 
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/e448ef74f4c9456dae00d75914499990)](https://www.codacy.com/gh/humenius/traefik-certs-dumper/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=humenius/traefik-certs-dumper&amp;utm_campaign=Badge_Grade)
+
 Dumps Let's Encrypt certificates of a specified domain to `.pem` and `.key` files which Traefik stores in `acme.json`.
 
 This image uses:
