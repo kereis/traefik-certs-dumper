@@ -23,7 +23,40 @@ dump() {
     --dest /tmp/work \
     --source /traefik/acme.json >/dev/null
 
-  if [[ "${#DOMAINS[@]}" -gt 1 ]]; then
+  if [[ -z "${DOMAIN}" ]]; then
+    local diff_available=false
+    local workdir_subdirs=(${workdir}/*/)
+    for subdir in "${workdir_subdirs[@]}" ; do
+      local i=$( basename ${subdir} / )
+      # Don't extract "private" because it contains Let's Encrypt key
+      if [[ "${i}" != "private" ]]; then
+        if
+          [[ -f ${workdir}/${i}/cert.pem && -f ${workdir}/${i}/key.pem ]]
+        then
+          if [[ -f ${outputdir}/${i}/cert.pem && -f ${outputdir}/${i}/key.pem ]] && \
+            diff -q "${workdir}/$i/cert.pem" "${outputdir}/$i/cert.pem" >/dev/null && \
+            diff -q "${workdir}/$i/key.pem" "${outputdir}/$i/key.pem" >/dev/null
+          then
+            log "Certificate and key for '${i}' still up to date, doing nothing"
+          else
+            log "Certificate or key for '${i}' differ, updating"
+            diff_available=true
+            local dir=${outputdir}/${i}
+            mkdir -p "${dir}" && mv ${workdir}/${i}/*.pem "${dir}"
+          fi
+        else
+          err "Certificates for domain '${i}' don't exist. Omitting..."
+        fi
+      fi
+    done
+
+    if [[ "${diff_available}" = true ]]; then
+      combine_pem
+      change_ownership
+      restart_containers
+      restart_services
+    fi
+  elif [[ "${#DOMAINS[@]}" -gt 1 ]]; then
     local diff_available=false
     for i in "${DOMAINS[@]}" ; do
       if
@@ -38,7 +71,7 @@ dump() {
           log "Certificate or key for '${i}' differ, updating"
           diff_available=true
           local dir=${outputdir}/${i}
-          mkdir -p "${dir}" && mv "${workdir}/${i}/*.pem" "${dir}"
+          mkdir -p "${dir}" && mv ${workdir}/${i}/*.pem "${dir}"
         fi
       else
         err "Certificates for domain '${i}' don't exist. Omitting..."
@@ -62,7 +95,7 @@ dump() {
         log "Certificate and key for '${DOMAINS[0]}' still up to date, doing nothing"
       else
         log "Certificate or key for '${DOMAINS[0]}' differ, updating"
-        mv "${workdir}/${DOMAINS[0]}/*.pem" "${outputdir}/"
+        mv ${workdir}/${DOMAINS[0]}/*.pem "${outputdir}/"
         combine_pem
         change_ownership
         restart_containers
@@ -299,7 +332,8 @@ else
 fi
 
 if [[ -z "${DOMAIN}" ]]; then
-  die "Environment variable DOMAIN mustn't be empty. Exiting..." 1
+  # die "Environment variable DOMAIN mustn't be empty. Exiting..." 1
+  log "Environment variable DOMAIN empty. Will dump all certificates possible..."
 else
   log "Got value of DOMAIN: ${DOMAIN}. Splitting values."
   IFS=',' read -ra DOMAINS <<< "$DOMAIN"
