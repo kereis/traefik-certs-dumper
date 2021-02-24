@@ -27,7 +27,7 @@ dump() {
     local diff_available=false
     local workdir_subdirs=(${workdir}/*/)
     for subdir in "${workdir_subdirs[@]}" ; do
-      local i=$( basename ${subdir} / )
+      local i=$( basename "${subdir}" / )
       # Don't extract "private" because it contains Let's Encrypt key
       if [[ "${i}" != "private" ]]; then
         if
