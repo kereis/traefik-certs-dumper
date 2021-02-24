@@ -22,8 +22,8 @@ Special thanks to them!
 ## Table Of Content
 * [Usage](#usage)
   + [Image choice](#image-choice)
-    - [`alpine` notes!](#-alpine--notes-)
   + [Basic setup](#basic-setup)
+  + [Dump all certificates](#dump-all-certificates)
   + [Automatic container restart](#automatic-container-restart)
   + [Change ownership of certificate and key files](#change-ownership-of-certificate-and-key-files)
   + [Extract multiple domains](#extract-multiple-domains)
@@ -51,12 +51,27 @@ version: '3.7'
 services:
   certdumper:
     image: humenius/traefik-certs-dumper:latest
-    container_name: traefik_certdumper
     volumes:
     - ./traefik/acme:/traefik:ro
     - ./output:/output:rw
     environment:
     - DOMAIN=example.org
+```
+
+### Dump all certificates
+The environment variable `DOMAIN` can be left out if you want to dump all available certificates.
+```yaml
+version: '3.7'
+
+services:
+  certdumper:
+    image: humenius/traefik-certs-dumper:latest
+    volumes:
+    - ./traefik/acme:/traefik:ro
+    - ./output:/output:rw
+    # Don't set DOMAIN
+    # environment:
+    # - DOMAIN=example.org
 ```
 
 ### Automatic container restart
@@ -67,7 +82,6 @@ version: '3.7'
 services:
   certdumper:
     image: humenius/traefik-certs-dumper:latest
-    container_name: traefik_certdumper
     command: --restart-containers container1,container2,container3
     volumes:
     - ./traefik/acme:/traefik:ro
@@ -87,7 +101,6 @@ version: '3.7'
 services:
   certdumper:
     image: humenius/traefik-certs-dumper:latest
-    container_name: traefik_certdumper
     command: --restart-containers container1,container2,container3
     volumes:
     - ./traefik/acme:/traefik:ro
@@ -111,7 +124,6 @@ version: '3.7'
 services:
   certdumper:
     image: humenius/traefik-certs-dumper:latest
-    container_name: traefik_certdumper
     volumes:
     - ./traefik/acme:/traefik:ro
     - ./output:/output:rw
@@ -130,7 +142,6 @@ version: '3.7'
 services:
   certdumper:
     image: humenius/traefik-certs-dumper:latest
-    container_name: traefik_certdumper
     volumes:
     - ./traefik/acme:/traefik:ro
     - ./output:/output:rw
