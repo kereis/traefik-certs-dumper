@@ -7,6 +7,8 @@
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/humenius/traefik-certs-dumper/build-docker-images?label=Docker%20build&logo=github)
 ![GitHub Workflow Status (Alpine)](https://img.shields.io/github/workflow/status/humenius/traefik-certs-dumper/build-alpine-images?label=Alpine%20build&logo=github)
 
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/e448ef74f4c9456dae00d75914499990)](https://www.codacy.com/gh/humenius/traefik-certs-dumper/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=humenius/traefik-certs-dumper&amp;utm_campaign=Badge_Grade)
+
 Dumps Let's Encrypt certificates of a specified domain to `.pem` and `.key` files which Traefik stores in `acme.json`.
 
 This image uses:
@@ -16,6 +18,18 @@ This image uses:
 Special thanks to them!
 
 **IMPORTANT**: It's supposed to work with Traefik **v2** or higher! If you want to use this certificate dumper with **v1**, you can simply change the image to [mailu/traefik-certdumper](https://hub.docker.com/r/mailu/traefik-certdumper).
+
+## Table Of Content
+* [Usage](#usage)
+  + [Image choice](#image-choice)
+  + [Basic setup](#basic-setup)
+  + [Dump all certificates](#dump-all-certificates)
+  + [Automatic container restart](#automatic-container-restart)
+  + [Change ownership of certificate and key files](#change-ownership-of-certificate-and-key-files)
+  + [Extract multiple domains](#extract-multiple-domains)
+  + [Health Check](#health-check)
+  + [Merging private key and public certificate in one .pem](#merging-private-key-and-public-certificate-in-one-pem)
+* [Help!](#help-)
 
 ## Usage
 ### Image choice
@@ -37,12 +51,27 @@ version: '3.7'
 services:
   certdumper:
     image: humenius/traefik-certs-dumper:latest
-    container_name: traefik_certdumper
     volumes:
     - ./traefik/acme:/traefik:ro
     - ./output:/output:rw
     environment:
     - DOMAIN=example.org
+```
+
+### Dump all certificates
+The environment variable `DOMAIN` can be left out if you want to dump all available certificates.
+```yaml
+version: '3.7'
+
+services:
+  certdumper:
+    image: humenius/traefik-certs-dumper:latest
+    volumes:
+    - ./traefik/acme:/traefik:ro
+    - ./output:/output:rw
+    # Don't set DOMAIN
+    # environment:
+    # - DOMAIN=example.org
 ```
 
 ### Automatic container restart
@@ -53,7 +82,6 @@ version: '3.7'
 services:
   certdumper:
     image: humenius/traefik-certs-dumper:latest
-    container_name: traefik_certdumper
     command: --restart-containers container1,container2,container3
     volumes:
     - ./traefik/acme:/traefik:ro
@@ -63,6 +91,8 @@ services:
     - DOMAIN=example.org
 ```
 
+It is also possible to restart Docker services. You can specify their names exactly like the containers via the optional parameter `--restart-services`. The services are updated with the command `docker service update --force <service_name>` which restarts all tasks in the service.
+
 ### Change ownership of certificate and key files
 If you want to change the onwership of the certificate and key files because your container runs on different permissions than `root`, you can specify the UID and GID as an environment variable. These environment variables are `OVERRIDE_UID` and `OVERRIDE_GID`. These can only be integers and must both be set for the override to work. For instance:
 ```yaml
@@ -71,7 +101,6 @@ version: '3.7'
 services:
   certdumper:
     image: humenius/traefik-certs-dumper:latest
-    container_name: traefik_certdumper
     command: --restart-containers container1,container2,container3
     volumes:
     - ./traefik/acme:/traefik:ro
@@ -95,7 +124,6 @@ version: '3.7'
 services:
   certdumper:
     image: humenius/traefik-certs-dumper:latest
-    container_name: traefik_certdumper
     volumes:
     - ./traefik/acme:/traefik:ro
     - ./output:/output:rw
@@ -114,7 +142,6 @@ version: '3.7'
 services:
   certdumper:
     image: humenius/traefik-certs-dumper:latest
-    container_name: traefik_certdumper
     volumes:
     - ./traefik/acme:/traefik:ro
     - ./output:/output:rw
@@ -128,6 +155,22 @@ services:
       retries: 5
 ```
 
+### Merging private key and public certificate in one .pem
+Load balancers like [HAProxy](http://www.haproxy.org/) need both private key and public certificate to be concatenated to one file. In this case, you can set the environment variable `COMBINED_PEM` to a desired file name ending with file extension `*.pem`. Each time `traefik-certs-dumper` dumps the certificates for specified `DOMAIN`, this script will create a `*.pem` file named after `COMBINED_PEM` in each domain's folder respectively.
+```yaml
+version: '3.7'
+
+services:
+  certdumper:
+    image: humenius/traefik-certs-dumper:latest
+    volumes:
+    - ./traefik/acme:/traefik:ro
+    - ./output:/output:rw
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      DOMAIN: example.com,example.org,example.net,hello.example.in
+      COMBINED_PEM: my_concatted_file.pem
+```
 
 ## Help!
 If you need help using this image, have suggestions or want to report a problem, feel free to open an issue on GitHub!
