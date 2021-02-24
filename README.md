@@ -130,6 +130,22 @@ services:
       retries: 5
 ```
 
+### Merging private key and public certificate in one .pem
+Load balancers like [HAProxy](http://www.haproxy.org/) need both private key and public certificate to be concatenated to one file. In this case, you can set the environment variable `COMBINED_PEM` to a desired file name ending with file extension `*.pem`. Each time `traefik-certs-dumper` dumps the certificates for specified `DOMAIN`, this script will create a `*.pem` file named after `COMBINED_PEM` in each domain's folder respectively.
+```yaml
+version: '3.7'
+
+services:
+  certdumper:
+    image: humenius/traefik-certs-dumper:latest
+    volumes:
+    - ./traefik/acme:/traefik:ro
+    - ./output:/output:rw
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      DOMAIN: example.com,example.org,example.net,hello.example.in
+      COMBINED_PEM: my_concatted_file.pem
+```
 
 ## Help!
 If you need help using this image, have suggestions or want to report a problem, feel free to open an issue on GitHub!
