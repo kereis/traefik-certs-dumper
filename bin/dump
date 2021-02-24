@@ -24,6 +24,7 @@ dump() {
     --source /traefik/acme.json >/dev/null
 
   if [[ "${#DOMAINS[@]}" -gt 1 ]]; then
+    local diff_available=false
     for i in "${DOMAINS[@]}" ; do
       if
         [[ -f ${workdir}/${i}/cert.pem && -f ${workdir}/${i}/key.pem ]]
@@ -35,15 +36,21 @@ dump() {
           log "Certificate and key for '${i}' still up to date, doing nothing"
         else
           log "Certificate or key for '${i}' differ, updating"
+          diff_available=true
           local dir=${outputdir}/${i}
           mkdir -p ${dir} && mv ${workdir}/${i}/*.pem ${dir}
-          change_ownership
-          restart_containers
         fi
       else
         err "Certificates for domain '${i}' don't exist. Omitting..."
       fi
     done
+
+    if [[ "${diff_available}" = true ]]; then
+      combine_pem
+      change_ownership
+      restart_containers
+      restart_services
+    fi
   else
     if
       [[ -f ${workdir}/${DOMAINS[0]}/cert.pem && -f ${workdir}/${DOMAINS[0]}/key.pem ]]
