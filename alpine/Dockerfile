@@ -1,5 +1,5 @@
 FROM ldez/traefik-certs-dumper:v2.7.0
-LABEL maintainer="Humenius <contact@humenius.me>"
+LABEL maintainer="kereis <kreis-dev@gmx.net>"
 
 RUN \
     apk update && \

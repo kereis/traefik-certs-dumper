@@ -1,5 +1,5 @@
 FROM ldez/traefik-certs-dumper:v2.7.0-arm.v8
-LABEL maintainer="Humenius <contact@humenius.me>"
+LABEL maintainer="kereis <kreis-dev@gmx.net>"
 
 COPY --from=multiarch/qemu-user-static:x86_64-aarch64 \
       /usr/bin/qemu-aarch64-static /usr/bin/qemu-aarch64-static
