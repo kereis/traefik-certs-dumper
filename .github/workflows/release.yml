@@ -79,7 +79,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./alpine/Dockerfile
+          file: ./docker/Dockerfile
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
           tags: ${{ steps.docker_meta.outputs.tags }}
@@ -90,7 +90,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./alpine/Dockerfile.armhf
+          file: ./docker/Dockerfile.armhf
           platforms: linux/arm/v7
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
@@ -102,7 +102,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./alpine/Dockerfile.aarch64
+          file: ./docker/Dockerfile.aarch64
           platforms: linux/arm64/v8
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache

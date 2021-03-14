@@ -1,5 +1,5 @@
 FROM docker:19.03.13
-LABEL maintainer="Humenius <contact@humenius.me>"
+LABEL maintainer="kereis <kreis-dev@gmx.net>"
 
 RUN \
     apk update && \
