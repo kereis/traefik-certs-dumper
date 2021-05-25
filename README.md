@@ -24,6 +24,7 @@ Special thanks to them!
   + [Image choice](#image-choice)
   + [Basic setup](#basic-setup)
   + [Dump all certificates](#dump-all-certificates)
+  + [Dump all certificates starting with](#dump-certificates-starting-with-string)
   + [Automatic container restart](#automatic-container-restart)
   + [Change ownership of certificate and key files](#change-ownership-of-certificate-and-key-files)
   + [Extract multiple domains](#extract-multiple-domains)
@@ -72,6 +73,21 @@ services:
     # Don't set DOMAIN
     # environment:
     # - DOMAIN=example.org
+```
+### Dump certificates starting with STRING
+Set the environment variable `DOMAIN_STARTS_WITH` instead of `DOMAIN`.
+```yaml
+version: '3.7'
+
+services:
+  certdumper:
+    image: humenius/traefik-certs-dumper:latest
+    volumes:
+    - ./traefik/acme:/traefik:ro
+    - ./output:/output:rw
+    # Don't set DOMAIN
+     environment:
+     - DOMAIN_STARTS_WITH=STRING
 ```
 
 ### Automatic container restart

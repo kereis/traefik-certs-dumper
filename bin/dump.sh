@@ -84,6 +84,34 @@ dump() {
       restart_containers
       restart_services
     fi
+  elif [[ -z "${DOMAIN_STARTS_WITH}" ]]; then
+    local diff_available=false
+    for i in `find ${workdir} -type d -name ${DOMAIN_STARTS_WITH}'*'` ; do
+      if
+        [[ -f ${workdir}/${i}/cert.pem && -f ${workdir}/${i}/key.pem ]]
+      then
+        if [[ -f ${outputdir}/${i}/cert.pem && -f ${outputdir}/${i}/key.pem ]] && \
+           diff -q "${workdir}/$i/cert.pem" "${outputdir}/$i/cert.pem" >/dev/null && \
+           diff -q "${workdir}/$i/key.pem" "${outputdir}/$i/key.pem" >/dev/null
+        then
+          log "Certificate and key for '${i}' still up to date, doing nothing"
+        else
+          log "Certificate or key for '${i}' differ, updating"
+          diff_available=true
+          local dir=${outputdir}/${i}
+          mkdir -p "${dir}" && mv ${workdir}/${i}/*.pem "${dir}"
+        fi
+      else
+        err "Certificates for domain '${i}' don't exist. Omitting..."
+      fi
+    done
+
+    if [[ "${diff_available}" = true ]]; then
+      combine_pem
+      change_ownership
+      restart_containers
+      restart_services
+    fi
   else
     if
       [[ -f ${workdir}/${DOMAINS[0]}/cert.pem && -f ${workdir}/${DOMAINS[0]}/key.pem ]]
