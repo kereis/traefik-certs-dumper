@@ -23,7 +23,7 @@ dump() {
     --dest /tmp/work \
     --source /traefik/acme.json >/dev/null
 
-  if [[ -z "${DOMAIN}" ]]; then
+  if [[ (-z "${DOMAIN}") && (-z "${DOMAIN_STARTS_WITH}") ]]; then
     local diff_available=false
     local workdir_subdirs=(${workdir}/*/)
     for subdir in "${workdir_subdirs[@]}" ; do
@@ -43,6 +43,9 @@ dump() {
             diff_available=true
             local dir=${outputdir}/${i}
             mkdir -p "${dir}" && mv ${workdir}/${i}/*.pem "${dir}"
+            log "Create domains file for '${i}'"
+            openssl x509 -noout -ext subjectAltName -in "${dir}/cert.pem" | \
+              sed '1d;s/ //g;s/DNS://g;s/,/ /g' > "${dir}/domains"
           fi
         else
           err "Certificates for domain '${i}' don't exist. Omitting..."
@@ -72,6 +75,41 @@ dump() {
           diff_available=true
           local dir=${outputdir}/${i}
           mkdir -p "${dir}" && mv ${workdir}/${i}/*.pem "${dir}"
+          log "Create domains file for '${i}'"
+          openssl x509 -noout -ext subjectAltName -in "${dir}/cert.pem" | \
+            sed '1d;s/ //g;s/DNS://g;s/,/ /g' > "${dir}/domains"
+        fi
+      else
+        err "Certificates for domain '${i}' don't exist. Omitting..."
+      fi
+    done
+
+    if [[ "${diff_available}" = true ]]; then
+      combine_pem
+      change_ownership
+      restart_containers
+      restart_services
+    fi
+  elif [[ ! (-z "${DOMAIN_STARTS_WITH}") ]]; then
+    local diff_available=false
+    for certdir in `find ${workdir} -type d -name ${DOMAIN_STARTS_WITH}'*'`; do
+      i=`basename ${certdir}`
+      if
+        [[ -f ${workdir}/${i}/cert.pem && -f ${workdir}/${i}/key.pem ]]
+      then
+        if [[ -f ${outputdir}/${i}/cert.pem && -f ${outputdir}/${i}/key.pem ]] && \
+           diff -q "${workdir}/$i/cert.pem" "${outputdir}/$i/cert.pem" >/dev/null && \
+           diff -q "${workdir}/$i/key.pem" "${outputdir}/$i/key.pem" >/dev/null
+        then
+          log "Certificate and key for '${i}' still up to date, doing nothing"
+        else
+          log "Certificate or key for '${i}' differ, updating"
+          diff_available=true
+          local dir=${outputdir}/${i}
+          mkdir -p "${dir}" && mv ${workdir}/${i}/*.pem "${dir}"
+          log "Create domains file for '${i}'"
+          openssl x509 -noout -ext subjectAltName -in "${dir}/cert.pem" | \
+            sed '1d;s/ //g;s/DNS://g;s/,/ /g' > "${dir}/domains"
         fi
       else
         err "Certificates for domain '${i}' don't exist. Omitting..."
@@ -331,9 +369,12 @@ else
   log "(e.g.: humenius/traefik-certs-dumper:latest)"
 fi
 
-if [[ -z "${DOMAIN}" ]]; then
+if [[ (-z "${DOMAIN}") && (-z "${DOMAIN_STARTS_WITH}") ]]; then
   # die "Environment variable DOMAIN mustn't be empty. Exiting..." 1
-  log "Environment variable DOMAIN empty. Will dump all certificates possible..."
+  log "Environment variable DOMAIN and DOMAIN_STARTS_WITH empty. Will dump all certificates possible..."
+elif [[ ! (-z "${DOMAIN_STARTS_WITH}") ]]; then
+  log "Environment variable DOMAIN_STARTS_WITH is set."
+  log "Will dump all certificates starting with ${DOMAIN_STARTS_WITH}"
 else
   log "Got value of DOMAIN: ${DOMAIN}. Splitting values."
   IFS=',' read -ra DOMAINS <<< "$DOMAIN"

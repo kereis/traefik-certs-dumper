@@ -6,7 +6,8 @@ RUN \
     apk add --no-cache \
         inotify-tools \
         util-linux \
-        bash
+        bash \
+        openssl
 
 COPY bin/dump.sh /usr/bin/dump
 COPY bin/healthcheck.sh /usr/bin/healthcheck
