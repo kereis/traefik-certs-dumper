@@ -368,9 +368,12 @@ else
   log "(e.g.: humenius/traefik-certs-dumper:latest)"
 fi
 
-if [[ -z "${DOMAIN}" ]]; then
+if [[ (-z "${DOMAIN}") && (-z "${DOMAIN_STARTS_WITH}") ]]; then
   # die "Environment variable DOMAIN mustn't be empty. Exiting..." 1
-  log "Environment variable DOMAIN empty. Will dump all certificates possible..."
+  log "Environment variable DOMAIN and DOMAIN_STARTS_WITH empty. Will dump all certificates possible..."
+elif [[ ! (-z "${DOMAIN_STARTS_WITH}") ]]; then
+  log "Environment variable DOMAIN_STARTS_WITH is set."
+  log "Will dump all certificates starting with ${DOMAIN_STARTS_WITH}"
 else
   log "Got value of DOMAIN: ${DOMAIN}. Splitting values."
   IFS=',' read -ra DOMAINS <<< "$DOMAIN"
