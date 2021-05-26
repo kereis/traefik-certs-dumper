@@ -23,7 +23,7 @@ dump() {
     --dest /tmp/work \
     --source /traefik/acme.json >/dev/null
 
-  if [[ -z "${DOMAIN}" ]]; then
+  if [[ (-z "${DOMAIN}") && (-z "${DOMAIN_STARTS_WITH}") ]]; then
     local diff_available=false
     local workdir_subdirs=(${workdir}/*/)
     for subdir in "${workdir_subdirs[@]}" ; do
@@ -43,6 +43,9 @@ dump() {
             diff_available=true
             local dir=${outputdir}/${i}
             mkdir -p "${dir}" && mv ${workdir}/${i}/*.pem "${dir}"
+            log "Create domains file for '${i}'"
+            openssl x509 -noout -ext subjectAltName -in "${dir}/cert.pem" | \
+              sed '1d;s/ //g;s/DNS://g;s/,/ /g' > "${dir}/domains"
           fi
         else
           err "Certificates for domain '${i}' don't exist. Omitting..."
@@ -72,6 +75,9 @@ dump() {
           diff_available=true
           local dir=${outputdir}/${i}
           mkdir -p "${dir}" && mv ${workdir}/${i}/*.pem "${dir}"
+          log "Create domains file for '${i}'"
+          openssl x509 -noout -ext subjectAltName -in "${dir}/cert.pem" | \
+            sed '1d;s/ //g;s/DNS://g;s/,/ /g' > "${dir}/domains"
         fi
       else
         err "Certificates for domain '${i}' don't exist. Omitting..."
@@ -84,7 +90,7 @@ dump() {
       restart_containers
       restart_services
     fi
-  elif [[ -z "${DOMAIN_STARTS_WITH}" ]]; then
+  elif [[ ! (-z "${DOMAIN_STARTS_WITH}") ]]; then
     local diff_available=false
     for i in `find ${workdir} -type d -name ${DOMAIN_STARTS_WITH}'*'` ; do
       if
@@ -100,6 +106,9 @@ dump() {
           diff_available=true
           local dir=${outputdir}/${i}
           mkdir -p "${dir}" && mv ${workdir}/${i}/*.pem "${dir}"
+          log "Create domains file for '${i}'"
+          openssl x509 -noout -ext subjectAltName -in "${dir}/cert.pem" | \
+            sed '1d;s/ //g;s/DNS://g;s/,/ /g' > "${dir}/domains"
         fi
       else
         err "Certificates for domain '${i}' don't exist. Omitting..."
