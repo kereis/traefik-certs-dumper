@@ -92,7 +92,8 @@ dump() {
     fi
   elif [[ ! (-z "${DOMAIN_STARTS_WITH}") ]]; then
     local diff_available=false
-    for i in $(basename `find ${workdir} -type d -name ${DOMAIN_STARTS_WITH}'*'`) ; do
+    for certdir in `find ${workdir} -type d -name ${DOMAIN_STARTS_WITH}'*'`; do
+      i=`basename ${certdir}`
       if
         [[ -f ${workdir}/${i}/cert.pem && -f ${workdir}/${i}/key.pem ]]
       then
