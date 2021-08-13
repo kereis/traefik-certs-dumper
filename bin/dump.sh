@@ -26,17 +26,16 @@ dump() {
   if [[ -z "${DOMAIN}" ]]; then
     local diff_available=false
     local workdir_subdirs=(${workdir}/*/)
-    for subdir in "${workdir_subdirs[@]}" ; do
-      local i=$( basename "${subdir}" / )
+    for subdir in "${workdir_subdirs[@]}"; do
+      local i=$(basename "${subdir}" /)
       # Don't extract "private" because it contains Let's Encrypt key
       if [[ "${i}" != "private" ]]; then
         if
           [[ -f ${workdir}/${i}/cert.pem && -f ${workdir}/${i}/key.pem ]]
         then
-          if [[ -f ${outputdir}/${i}/cert.pem && -f ${outputdir}/${i}/key.pem ]] && \
-            diff -q "${workdir}/$i/cert.pem" "${outputdir}/$i/cert.pem" >/dev/null && \
-            diff -q "${workdir}/$i/key.pem" "${outputdir}/$i/key.pem" >/dev/null
-          then
+          if [[ -f ${outputdir}/${i}/cert.pem && -f ${outputdir}/${i}/key.pem ]] &&
+            diff -q "${workdir}/$i/cert.pem" "${outputdir}/$i/cert.pem" >/dev/null &&
+            diff -q "${workdir}/$i/key.pem" "${outputdir}/$i/key.pem" >/dev/null; then
             log "Certificate and key for '${i}' still up to date, doing nothing"
           else
             log "Certificate or key for '${i}' differ, updating"
@@ -51,6 +50,7 @@ dump() {
     done
 
     if [[ "${diff_available}" = true ]]; then
+      combine_pkcs12
       combine_pem
       change_ownership
       restart_containers
@@ -58,14 +58,13 @@ dump() {
     fi
   elif [[ "${#DOMAINS[@]}" -gt 1 ]]; then
     local diff_available=false
-    for i in "${DOMAINS[@]}" ; do
+    for i in "${DOMAINS[@]}"; do
       if
         [[ -f ${workdir}/${i}/cert.pem && -f ${workdir}/${i}/key.pem ]]
       then
-        if [[ -f ${outputdir}/${i}/cert.pem && -f ${outputdir}/${i}/key.pem ]] && \
-           diff -q "${workdir}/$i/cert.pem" "${outputdir}/$i/cert.pem" >/dev/null && \
-           diff -q "${workdir}/$i/key.pem" "${outputdir}/$i/key.pem" >/dev/null
-        then
+        if [[ -f ${outputdir}/${i}/cert.pem && -f ${outputdir}/${i}/key.pem ]] &&
+          diff -q "${workdir}/$i/cert.pem" "${outputdir}/$i/cert.pem" >/dev/null &&
+          diff -q "${workdir}/$i/key.pem" "${outputdir}/$i/key.pem" >/dev/null; then
           log "Certificate and key for '${i}' still up to date, doing nothing"
         else
           log "Certificate or key for '${i}' differ, updating"
@@ -79,6 +78,7 @@ dump() {
     done
 
     if [[ "${diff_available}" = true ]]; then
+      combine_pkcs12
       combine_pem
       change_ownership
       restart_containers
@@ -88,14 +88,14 @@ dump() {
     if
       [[ -f ${workdir}/${DOMAINS[0]}/cert.pem && -f ${workdir}/${DOMAINS[0]}/key.pem ]]
     then
-      if [[ -f ${outputdir}/cert.pem && -f ${outputdir}/key.pem ]] && \
-         diff -q "${workdir}/${DOMAINS[0]}/cert.pem" "${outputdir}/cert.pem" >/dev/null && \
-         diff -q "${workdir}/${DOMAINS[0]}/key.pem" "${outputdir}/key.pem" >/dev/null
-      then
+      if [[ -f ${outputdir}/cert.pem && -f ${outputdir}/key.pem ]] &&
+        diff -q "${workdir}/${DOMAINS[0]}/cert.pem" "${outputdir}/cert.pem" >/dev/null &&
+        diff -q "${workdir}/${DOMAINS[0]}/key.pem" "${outputdir}/key.pem" >/dev/null; then
         log "Certificate and key for '${DOMAINS[0]}' still up to date, doing nothing"
       else
         log "Certificate or key for '${DOMAINS[0]}' differ, updating"
         mv ${workdir}/${DOMAINS[0]}/*.pem "${outputdir}/"
+        combine_pkcs12
         combine_pem
         change_ownership
         restart_containers
@@ -114,18 +114,44 @@ combine_pem() {
       log "COMBINED_PEM=${COMBINED_PEM} does not have .pem at end of filename."
     else
       if [[ "${#DOMAINS[@]}" -gt 1 ]]; then
-        for i in "${DOMAINS[@]}" ; do
+        for i in "${DOMAINS[@]}"; do
           if [[ -f ${outputdir}/${i}/cert.pem && -f ${outputdir}/${i}/key.pem ]]; then
             log "Combining key and cert for domain ${i} to single pem with name ${i}/${COMBINED_PEM}"
-            cat ${outputdir}/"${i}"/cert.pem ${outputdir}/"${i}"/key.pem > ${outputdir}/"${i}"/"${COMBINED_PEM}"
+            cat ${outputdir}/"${i}"/cert.pem ${outputdir}/"${i}"/key.pem >${outputdir}/"${i}"/"${COMBINED_PEM}"
           fi
         done
       else
         if [[ -f ${outputdir}/cert.pem && -f ${outputdir}/key.pem ]]; then
           log "Combining key and cert to single pem with name ${COMBINED_PEM}"
-          cat ${outputdir}/cert.pem ${outputdir}/key.pem > ${outputdir}/"${COMBINED_PEM}"
+          cat ${outputdir}/cert.pem ${outputdir}/key.pem >${outputdir}/"${COMBINED_PEM}"
         fi
       fi
+    fi
+  fi
+}
+
+combine_pkcs12() {
+  if [[ -z ${COMBINE_PKCS12+x} ]]; then
+    return
+  fi
+
+  if [[ -z ${PKCS12_PASSWORD+x} && -n ${PKCS12_PASSWORD_FILE+x} ]]; then
+    PKCS12_PASSWORD=$(cat $PKCS12_PASSWORD_FILE)
+  fi
+
+  if [[ -z "${DOMAIN}" || "${#DOMAINS[@]}" -gt 1 ]]; then
+    local outputdir_subdirs=(${outputdir}/*/)
+    for subdir in "${outputdir_subdirs[@]}"; do
+      local i=$(basename "${subdir}" /)
+      if [[ -f ${outputdir}/${i}/cert.pem && -f ${outputdir}/${i}/key.pem ]]; then
+        log "Combining key and cert for domain ${i} to pkcs12 file"
+        openssl pkcs12 -export -in ${outputdir}/"${i}"/cert.pem -inkey ${outputdir}/"${i}"/key.pem -out ${outputdir}/"${i}"/cert.p12 -password pass:"${PKCS12_PASSWORD}"
+      fi
+    done
+  else
+    if [[ -f ${outputdir}/cert.pem && -f ${outputdir}/key.pem ]]; then
+      log "Combining key and cert to pkcs12 file"
+      openssl pkcs12 -export -in ${outputdir}/cert.pem -inkey ${outputdir}/key.pem -out ${outputdir}/cert.p12 -password pass:"${PKCS12_PASSWORD}"
     fi
   fi
 }
@@ -135,16 +161,16 @@ change_ownership() {
     if [[ ! "${OVERRIDE_UID}" =~ $re || ! "${OVERRIDE_GID}" =~ $re ]]; then
       #Check on UID
       if [[ ! "${OVERRIDE_UID}" =~ $re ]]; then
-          log "OVERRIDE_UID=${OVERRIDE_UID} is not an integer."
+        log "OVERRIDE_UID=${OVERRIDE_UID} is not an integer."
       fi
       #Check on GID
       if [[ ! "${OVERRIDE_GID}" =~ $re ]]; then
-          log "OVERRIDE_GID=${OVERRIDE_GID} is not an integer."
+        log "OVERRIDE_GID=${OVERRIDE_GID} is not an integer."
       fi
       log "Combination ${OVERRIDE_UID}:${OVERRIDE_GID} is invalid. Skipping file ownership change..."
     else
       log "Changing ownership of certificates and keys"
-      find ${outputdir}/ -type f -name "*.pem" | while read -r f; do
+      find ${outputdir}/ -type f \( -name "*.pem" -o -name "*.p12" \) | while read -r f; do
         chown "${OVERRIDE_UID}":"${OVERRIDE_GID}" "$f"
         chmod g+r "$f"
       done
@@ -226,8 +252,7 @@ check_docker_cmd() {
   [[ -x "$(command -v docker)" ]]
   local _result=$?
 
-  if (( _result == 1 )); then
-
+  if ((_result == 1)); then
 
     unset __ret
   else
@@ -315,14 +340,14 @@ if [[ "${_docker_available}" = true ]]; then
     log "--restart-containers is empty. Won't attempt to restart containers."
   else
     log "Got value of --restart-containers: ${_arg_restart_containers}. Splitting values."
-    IFS=',' read -ra CONTAINERS <<< "$_arg_restart_containers"
+    IFS=',' read -ra CONTAINERS <<<"$_arg_restart_containers"
     log "Values split! Got '${CONTAINERS[@]}'"
   fi
   if [[ -z "${_arg_restart_services}" ]]; then
     log "--restart-services is empty. Won't attempt to restart services."
   else
     log "Got value of --restart-services: ${_arg_restart_services}. Splitting values."
-    IFS=',' read -ra SERVICES <<< "$_arg_restart_services"
+    IFS=',' read -ra SERVICES <<<"$_arg_restart_services"
     log "Values split! Got '${SERVICES[@]}'"
   fi
 else
@@ -336,7 +361,7 @@ if [[ -z "${DOMAIN}" ]]; then
   log "Environment variable DOMAIN empty. Will dump all certificates possible..."
 else
   log "Got value of DOMAIN: ${DOMAIN}. Splitting values."
-  IFS=',' read -ra DOMAINS <<< "$DOMAIN"
+  IFS=',' read -ra DOMAINS <<<"$DOMAIN"
   log "Values split! Got '${DOMAINS[@]}'"
 fi
 

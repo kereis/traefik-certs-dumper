@@ -20,16 +20,20 @@ Special thanks to them!
 **IMPORTANT**: It's supposed to work with Traefik **v2** or higher! If you want to use this certificate dumper with **v1**, you can simply change the image to [mailu/traefik-certdumper](https://hub.docker.com/r/mailu/traefik-certdumper).
 
 ## Table Of Content
-* [Usage](#usage)
-  + [Image choice](#image-choice)
-  + [Basic setup](#basic-setup)
-  + [Dump all certificates](#dump-all-certificates)
-  + [Automatic container restart](#automatic-container-restart)
-  + [Change ownership of certificate and key files](#change-ownership-of-certificate-and-key-files)
-  + [Extract multiple domains](#extract-multiple-domains)
-  + [Health Check](#health-check)
-  + [Merging private key and public certificate in one .pem](#merging-private-key-and-public-certificate-in-one-pem)
-* [Help!](#help-)
+- [traefik-certs-dumper](#traefik-certs-dumper)
+  - [Table Of Content](#table-of-content)
+  - [Usage](#usage)
+    - [Image choice](#image-choice)
+      - [`alpine` notes!](#alpine-notes)
+    - [Basic setup](#basic-setup)
+    - [Dump all certificates](#dump-all-certificates)
+    - [Automatic container restart](#automatic-container-restart)
+    - [Change ownership of certificate and key files](#change-ownership-of-certificate-and-key-files)
+    - [Extract multiple domains](#extract-multiple-domains)
+    - [Health Check](#health-check)
+    - [Merging private key and public certificate in one .pem](#merging-private-key-and-public-certificate-in-one-pem)
+    - [Merging private key and public certificate in one PKCS12 file](#merging-private-key-and-public-certificate-in-one-pkcs12-file)
+  - [Help!](#help)
 
 ## Usage
 ### Image choice
@@ -170,6 +174,36 @@ services:
     environment:
       DOMAIN: example.com,example.org,example.net,hello.example.in
       COMBINED_PEM: my_concatted_file.pem
+```
+
+### Merging private key and public certificate in one PKCS12 file
+
+Some applications like [Plex](https://www.plex.tv/de/) need both private key and public certificate to be concatenated to one PKCS12 file. In this case, you can set the environment variable `COMBINE_PKCS12` to any value (In Docker, no value means not setting. Must be atleast "".). Each time `traefik-certs-dumper` dumps the certificates for specified `DOMAIN`, this script will create a file named `cert.p12` in each domain's folder respectively. The password can be set with the environment variable `PKCS12_PASSWORD` which has support for docker secrets with the `PKCS12_PASSWORD_FILE` environment variable. If none of those is set, the password will be empty.
+
+```yaml
+version: '3.7'
+
+services:
+  certdumper:
+    image: humenius/traefik-certs-dumper:latest
+    container_name: traefik_certdumper
+    network_mode: none
+    volumes:
+      - /docker-data/traefik2:/traefik:ro
+      - /docker-data/certdumb:/output:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro # Only needed if restarting containers (use Docker Socket Proxy instead)
+    secrets:
+      - pkcs12_password
+    environment:
+      DOMAIN: $DOMAINNAME0
+      PKCS12_PASSWORD_FILE: /run/secrets/pkcs12_password
+      COMBINE_PKCS12: "true"
+      OVERRIDE_UID: 1000
+      OVERRIDE_GID: 1000
+
+secrets:
+  pkcs12_password:
+    file: /path/to/secret/PKCS12_PASSWORD
 ```
 
 ## Help!
