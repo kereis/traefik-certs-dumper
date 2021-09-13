@@ -191,7 +191,7 @@ services:
     volumes:
       - /docker-data/traefik2:/traefik:ro
       - /docker-data/certdumb:/output:rw
-      - /var/run/docker.sock:/var/run/docker.sock:ro # Only needed if restarting containers (use Docker Socket Proxy instead)
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     secrets:
       - pkcs12_password
     environment:
