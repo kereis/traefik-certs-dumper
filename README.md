@@ -178,7 +178,7 @@ services:
 
 ### Merging private key and public certificate in one PKCS12 file
 
-Some applications like [Plex](https://www.plex.tv/de/) need both private key and public certificate to be concatenated to one PKCS12 file. In this case, you can set the environment variable `COMBINE_PKCS12` to any value (In Docker, no value means not setting. Must be atleast "".). Each time `traefik-certs-dumper` dumps the certificates for specified `DOMAIN`, this script will create a file named `cert.p12` in each domain's folder respectively. The password can be set with the environment variable `PKCS12_PASSWORD` which has support for docker secrets with the `PKCS12_PASSWORD_FILE` environment variable. If none of those is set, the password will be empty.
+Some applications like [Plex](https://www.plex.tv/de/) need both private key and public certificate to be concatenated to one PKCS12 file. In this case, you can set the environment variable `COMBINE_PKCS12=yes`. Each time `traefik-certs-dumper` dumps the certificates for specified `DOMAIN`, this script will create a file named `cert.p12` in each domain's folder respectively. The password can be set with the environment variable `PKCS12_PASSWORD`. If you want to use Docker Secrets instead, use the environment variable `PKCS12_PASSWORD_FILE`. Note that `PKCS12_PASSWORD` has higher priority. If none of those is set, the password will be empty.
 
 ```yaml
 version: '3.7'
@@ -195,7 +195,7 @@ services:
     secrets:
       - pkcs12_password
     environment:
-      DOMAIN: $DOMAINNAME0
+      DOMAIN: example.com
       PKCS12_PASSWORD_FILE: /run/secrets/pkcs12_password
       COMBINE_PKCS12: "true"
       OVERRIDE_UID: 1000
