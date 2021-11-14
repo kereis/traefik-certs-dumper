@@ -197,7 +197,7 @@ services:
     environment:
       DOMAIN: example.com
       PKCS12_PASSWORD_FILE: /run/secrets/pkcs12_password
-      COMBINE_PKCS12: "true"
+      COMBINE_PKCS12: "yes"
       OVERRIDE_UID: 1000
       OVERRIDE_GID: 1000
 

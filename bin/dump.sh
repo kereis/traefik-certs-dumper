@@ -150,7 +150,7 @@ combine_pkcs12() {
     done
   else
     if [[ -f ${outputdir}/cert.pem && -f ${outputdir}/key.pem ]]; then
-      log "Combining key and cert to pkcs12 file"
+      log "Combining key and cert to PKCS12 file"
       openssl pkcs12 -export -in ${outputdir}/cert.pem -inkey ${outputdir}/key.pem -out ${outputdir}/cert.p12 -password pass:"${PKCS12_PASSWORD}"
     fi
   fi
