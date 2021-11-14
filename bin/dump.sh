@@ -131,7 +131,7 @@ combine_pem() {
 }
 
 combine_pkcs12() {
-  if [[ ! "${COMBINE_PKCS12}" = yes ]]; then
+  if [[ "${COMBINE_PKCS12}" != yes ]]; then
     return
   fi
 
