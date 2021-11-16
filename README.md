@@ -20,20 +20,18 @@ Special thanks to them!
 **IMPORTANT**: It's supposed to work with Traefik **v2** or higher! If you want to use this certificate dumper with **v1**, you can simply change the image to [mailu/traefik-certdumper](https://hub.docker.com/r/mailu/traefik-certdumper).
 
 ## Table Of Content
-- [traefik-certs-dumper](#traefik-certs-dumper)
-  - [Table Of Content](#table-of-content)
-  - [Usage](#usage)
-    - [Image choice](#image-choice)
-      - [`alpine` notes!](#alpine-notes)
-    - [Basic setup](#basic-setup)
-    - [Dump all certificates](#dump-all-certificates)
-    - [Automatic container restart](#automatic-container-restart)
-    - [Change ownership of certificate and key files](#change-ownership-of-certificate-and-key-files)
-    - [Extract multiple domains](#extract-multiple-domains)
-    - [Health Check](#health-check)
-    - [Merging private key and public certificate in one .pem](#merging-private-key-and-public-certificate-in-one-pem)
-    - [Merging private key and public certificate in one PKCS12 file](#merging-private-key-and-public-certificate-in-one-pkcs12-file)
-  - [Help!](#help)
+* [Usage](#usage)
+  + [Image choice](#image-choice)
+  + [Basic setup](#basic-setup)
+  + [Dump all certificates](#dump-all-certificates)
+  + [Custom ACME file name](#custom-acme-file-name)
+  + [Automatic container restart](#automatic-container-restart)
+  + [Change ownership of certificate and key files](#change-ownership-of-certificate-and-key-files)
+  + [Extract multiple domains](#extract-multiple-domains)
+  + [Health Check](#health-check)
+  + [Merging private key and public certificate in one .pem](#merging-private-key-and-public-certificate-in-one-pem)
+  + [Merging private key and public certificate in one PKCS12 file](#merging-private-key-and-public-certificate-in-one-pkcs12-file)
+* [Help!](#help-)
 
 ## Usage
 ### Image choice
@@ -76,6 +74,21 @@ services:
     # Don't set DOMAIN
     # environment:
     # - DOMAIN=example.org
+```
+
+### Custom ACME file name
+Use environment variable `ACME_FILE_PATH` if you don't want to use the default path or if your ACME JSON file has a different name.
+```yaml
+version: '3.7'
+
+services:
+  certdumper:
+    image: humenius/traefik-certs-dumper:latest
+    volumes:
+      - ./traefik/acme:/my/custom/path:ro
+      - ./output:/output:rw
+    environment:
+      - ACME_FILE: /my/custom/path/acme_the_second.json
 ```
 
 ### Automatic container restart
@@ -178,7 +191,7 @@ services:
 
 ### Merging private key and public certificate in one PKCS12 file
 
-Some applications like [Plex](https://www.plex.tv/de/) need both private key and public certificate to be concatenated to one PKCS12 file. In this case, you can set the environment variable `COMBINE_PKCS12=yes`. Each time `traefik-certs-dumper` dumps the certificates for specified `DOMAIN`, this script will create a file named `cert.p12` in each domain's folder respectively. The password can be set with the environment variable `PKCS12_PASSWORD`. If you want to use Docker Secrets instead, use the environment variable `PKCS12_PASSWORD_FILE`. Note that `PKCS12_PASSWORD` has higher priority. If none of those is set, the password will be empty.
+Some applications like [Plex](https://www.plex.tv/de/) need both private key and public certificate to be concatenated to one PKCS12 file. In this case, you can set the environment variable `COMBINE_PKCS12=yes`. Each time `traefik-certs-dumper` dumps the certificates for specified `DOMAIN`, this script will create a file named `cert.p12` in each domain's folder respectively. The password can be set with the environment variable `PKCS12_PASSWORD`. If you want to use Docker Secrets instead, use the environment variable `PKCS12_PASSWORD_FILE`. Note that `PKCS12_PASSWORD` has higher priority. If none of those are set, the password will be empty.
 
 ```yaml
 version: '3.7'

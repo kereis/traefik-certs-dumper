@@ -3,6 +3,7 @@
 workdir=/tmp/work
 outputdir=/output
 re='^[0-9]+$'
+acme_file_path=${ACME_FILE_PATH:-/traefik/acme.json}
 
 ###############################################
 ####             DUMPING LOGIC             ####
@@ -21,7 +22,7 @@ dump() {
     --key-ext ".pem" \
     --domain-subdir \
     --dest /tmp/work \
-    --source /traefik/acme.json >/dev/null
+    --source ${acme_file_path} >/dev/null
 
   if [[ -z "${DOMAIN}" ]]; then
     local diff_available=false
@@ -365,10 +366,12 @@ else
   log "Values split! Got '${DOMAINS[@]}'"
 fi
 
+log "ACME file path: $acme_file_path"
+
 mkdir -p ${workdir}
 dump
 
 while true; do
-  inotifywait -qq -e modify /traefik/acme.json
+  inotifywait -qq -e modify "${acme_file_path}"
   dump
 done
