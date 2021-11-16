@@ -30,6 +30,7 @@ Special thanks to them!
   + [Extract multiple domains](#extract-multiple-domains)
   + [Health Check](#health-check)
   + [Merging private key and public certificate in one .pem](#merging-private-key-and-public-certificate-in-one-pem)
+  + [Merging private key and public certificate in one PKCS12 file](#merging-private-key-and-public-certificate-in-one-pkcs12-file)
 * [Help!](#help-)
 
 ## Usage
@@ -186,6 +187,36 @@ services:
     environment:
       DOMAIN: example.com,example.org,example.net,hello.example.in
       COMBINED_PEM: my_concatted_file.pem
+```
+
+### Merging private key and public certificate in one PKCS12 file
+
+Some applications like [Plex](https://www.plex.tv/de/) need both private key and public certificate to be concatenated to one PKCS12 file. In this case, you can set the environment variable `COMBINE_PKCS12=yes`. Each time `traefik-certs-dumper` dumps the certificates for specified `DOMAIN`, this script will create a file named `cert.p12` in each domain's folder respectively. The password can be set with the environment variable `PKCS12_PASSWORD`. If you want to use Docker Secrets instead, use the environment variable `PKCS12_PASSWORD_FILE`. Note that `PKCS12_PASSWORD` has higher priority. If none of those are set, the password will be empty.
+
+```yaml
+version: '3.7'
+
+services:
+  certdumper:
+    image: humenius/traefik-certs-dumper:latest
+    container_name: traefik_certdumper
+    network_mode: none
+    volumes:
+      - ./traefik/acme:/traefik:ro
+      - ./output:/output:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    secrets:
+      - pkcs12_password
+    environment:
+      DOMAIN: example.com
+      PKCS12_PASSWORD_FILE: /run/secrets/pkcs12_password
+      COMBINE_PKCS12: "yes"
+      OVERRIDE_UID: 1000
+      OVERRIDE_GID: 1000
+
+secrets:
+  pkcs12_password:
+    file: /path/to/secret/PKCS12_PASSWORD
 ```
 
 ## Help!
