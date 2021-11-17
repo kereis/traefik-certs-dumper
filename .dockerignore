@@ -1,7 +1,7 @@
-.dockerignore
+**/.dockerignore
 .git
 .github
 .gitignore
 .gitmodules
-Dockerfile
-docker-compose.yml
+**/Dockerfile
+**/docker-compose.yml
