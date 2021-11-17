@@ -20,7 +20,7 @@ jobs:
 
       - name: Prepare tags for normal build
         id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v1
+        uses: crazy-max/ghaction-docker-meta@v3.6.0
         with:
           images: ${{ env.DOCKER_IMAGE }}
           tag-sha: true
@@ -31,7 +31,7 @@ jobs:
 
       - name: Prepare tags for arm32v7 build
         id: docker_meta_arm32v7
-        uses: crazy-max/ghaction-docker-meta@v1
+        uses: crazy-max/ghaction-docker-meta@v3.6.0
         with:
           images: ${{ env.DOCKER_IMAGE }}
           tag-semver: |
@@ -44,7 +44,7 @@ jobs:
 
       - name: Prepare tags for arm64v8 build
         id: docker_meta_arm64v8
-        uses: crazy-max/ghaction-docker-meta@v1
+        uses: crazy-max/ghaction-docker-meta@v3.6.0
         with:
           images: ${{ env.DOCKER_IMAGE }}
           tag-semver: |
@@ -120,7 +120,7 @@ jobs:
 
       - name: Prepare tags for normal build
         id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v1
+        uses: crazy-max/ghaction-docker-meta@v3.6.0
         with:
           images: ${{ env.DOCKER_IMAGE }}
           tag-semver: |
@@ -134,7 +134,7 @@ jobs:
 
       - name: Prepare tags for arm32v7 build
         id: docker_meta_arm32v7
-        uses: crazy-max/ghaction-docker-meta@v1
+        uses: crazy-max/ghaction-docker-meta@v3.6.0
         with:
           images: ${{ env.DOCKER_IMAGE }}
           tag-semver: |
@@ -147,7 +147,7 @@ jobs:
 
       - name: Prepare tags for arm64v8 build
         id: docker_meta_arm64v8
-        uses: crazy-max/ghaction-docker-meta@v1
+        uses: crazy-max/ghaction-docker-meta@v3.6.0
         with:
           images: ${{ env.DOCKER_IMAGE }}
           tag-semver: |
