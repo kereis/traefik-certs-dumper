@@ -1,4 +1,4 @@
-FROM docker:19.03.13
+FROM docker:20.10.10
 LABEL maintainer="kereis <kreis-dev@gmx.net>"
 
 RUN \
