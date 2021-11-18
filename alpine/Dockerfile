@@ -1,4 +1,4 @@
-FROM ldez/traefik-certs-dumper:v2.7.0
+FROM ldez/traefik-certs-dumper:v2.7.4
 LABEL maintainer="kereis <kreis-dev@gmx.net>"
 
 RUN \
