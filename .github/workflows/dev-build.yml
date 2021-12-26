@@ -27,7 +27,7 @@ jobs:
           images: ${{ env.DOCKER_IMAGE }}
           tag-sha: true
           tag-semver: |
-            {{raw}}-dev
+            {{version}}-dev
           tag-latest: false
 
       - name: Prepare tags for arm32v7 build
@@ -35,18 +35,30 @@ jobs:
         uses: docker/metadata-action@v3.6.1
         with:
           images: ${{ env.DOCKER_IMAGE }}
-          tag-semver: |
-            {{raw}}-arm32v7-dev
-          tag-latest: false
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha
+          flavor: |
+            latest=false
+            suffix=arm32v7
+          # images: ${{ env.DOCKER_IMAGE }}
+          # tag-semver: |
+          #   {{version}}-arm32v7-dev
+          # tag-latest: false
 
       - name: Prepare tags for arm64v8 build
         id: docker_meta_arm64v8
         uses: docker/metadata-action@v3.6.1
         with:
           images: ${{ env.DOCKER_IMAGE }}
-          tag-semver: |
-            {{raw}}-arm64v8-dev
-          tag-latest: false
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha
+          flavor: |
+            latest=false
+            suffix=arm64v8
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -119,27 +131,39 @@ jobs:
         uses: docker/metadata-action@v3.6.1
         with:
           images: ${{ env.DOCKER_IMAGE }}
-          tag-semver: |
-            {{raw}}-alpine-dev
-          tag-latest: false
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha
+          flavor: |
+            latest=false
+            suffix=alpine
 
       - name: Prepare tags for arm32v7 build
         id: docker_meta_arm32v7
         uses: docker/metadata-action@v3.6.1
         with:
           images: ${{ env.DOCKER_IMAGE }}
-          tag-semver: |
-            {{raw}}-arm32v7-alpine-dev
-          tag-latest: false
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha
+          flavor: |
+            latest=false
+            suffix=arm32v7-alpine
 
       - name: Prepare tags for arm64v8 build
         id: docker_meta_arm64v8
         uses: docker/metadata-action@v3.6.1
         with:
           images: ${{ env.DOCKER_IMAGE }}
-          tag-semver: |
-            {{raw}}-arm64v8-alpine-dev
-          tag-latest: false
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha
+          flavor: |
+            latest=false
+            suffix=arm64v8-alpine
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
