@@ -25,10 +25,12 @@ jobs:
         uses: docker/metadata-action@v3.6.1
         with:
           images: ${{ env.DOCKER_IMAGE }}
-          tag-sha: true
-          tag-semver: |
-            {{version}}-dev
-          tag-latest: false
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha
+          flavor: |
+            latest=false
 
       - name: Prepare tags for arm32v7 build
         id: docker_meta_arm32v7
@@ -42,10 +44,6 @@ jobs:
           flavor: |
             latest=false
             suffix=arm32v7
-          # images: ${{ env.DOCKER_IMAGE }}
-          # tag-semver: |
-          #   {{version}}-arm32v7-dev
-          # tag-latest: false
 
       - name: Prepare tags for arm64v8 build
         id: docker_meta_arm64v8
