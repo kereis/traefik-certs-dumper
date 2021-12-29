@@ -43,7 +43,7 @@ jobs:
             type=semver,pattern={{major}}
           flavor: |
             latest=false
-            suffix=arm32v7
+            suffix=-arm32v7
 
       - name: Prepare tags for arm64v8 build
         id: docker_meta_arm64v8
@@ -57,7 +57,7 @@ jobs:
             type=semver,pattern={{major}}
           flavor: |
             latest=false
-            suffix=arm64v8
+            suffix=-arm64v8
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -134,8 +134,8 @@ jobs:
             type=semver,pattern={{major}}
           flavor: |
             latest=false
-            suffix=alpine
-            suffix=amd64-alpine
+            suffix=-alpine
+            suffix=-amd64-alpine
 
       - name: Prepare tags for arm32v7 build
         id: docker_meta_arm32v7
@@ -149,7 +149,7 @@ jobs:
             type=semver,pattern={{major}}
           flavor: |
             latest=false
-            suffix=arm32v7-alpine
+            suffix=-arm32v7-alpine
 
       - name: Prepare tags for arm64v8 build
         id: docker_meta_arm64v8
@@ -163,7 +163,7 @@ jobs:
             type=semver,pattern={{major}}
           flavor: |
             latest=false
-            suffix=arm64v8-alpine
+            suffix=-arm64v8-alpine
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
