@@ -247,17 +247,17 @@ log() {
   echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')]: $*"
 }
 
-check_docker_cmd() {
-  local __ret=$1
+check_cmd() {
+  local cmd=$1
 
-  [[ -x "$(command -v docker)" ]]
+  #check command exist, but no output
+  command -v $1 >/dev/null 
+
   local _result=$?
-
   if ((_result == 1)); then
-
-    unset __ret
+    echo false
   else
-    eval "$__ret=true"
+    echo true
   fi
 }
 
@@ -333,8 +333,7 @@ parse_commandline() {
 
 parse_commandline "$@"
 
-_docker_available=
-check_docker_cmd _docker_available
+_docker_available=$(check_cmd docker)
 
 if [[ "${_docker_available}" = true ]]; then
   if [[ -z "${_arg_restart_containers}" ]]; then
