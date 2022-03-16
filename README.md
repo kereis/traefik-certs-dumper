@@ -28,18 +28,21 @@ Special thanks to them!
 Table of Contents
 =================
 <!--ts-->
-* [Usage](#usage)
-   * [Image choice](#image-choice)
-   * [Basic setup](#basic-setup)
-   * [Dump all certificates](#dump-all-certificates)
-   * [Custom ACME file name](#custom-acme-file-name)
-   * [Automatic container restart](#automatic-container-restart)
-   * [Change ownership of certificate and key files](#change-ownership-of-certificate-and-key-files)
-   * [Extract multiple domains](#extract-multiple-domains)
-   * [Health Check](#health-check)
-   * [Merging private key and public certificate in one .pem](#merging-private-key-and-public-certificate-in-one-pem)
-   * [Merging private key and public certificate in one PKCS12 file](#merging-private-key-and-public-certificate-in-one-pkcs12-file)
-* [Help!](#help)
+- [traefik-certs-dumper](#traefik-certs-dumper)
+- [Table of Contents](#table-of-contents)
+- [Usage](#usage)
+  - [Image choice](#image-choice)
+  - [Environment Variables](#environment-variables)
+  - [Basic setup](#basic-setup)
+  - [Dump all certificates](#dump-all-certificates)
+  - [Custom ACME file name](#custom-acme-file-name)
+  - [Automatic container restart](#automatic-container-restart)
+  - [Change ownership of certificate and key files](#change-ownership-of-certificate-and-key-files)
+  - [Extract multiple domains](#extract-multiple-domains)
+  - [Health Check](#health-check)
+  - [Merging private key and public certificate in one .pem](#merging-private-key-and-public-certificate-in-one-pem)
+  - [Merging private key and public certificate in one PKCS12 file](#merging-private-key-and-public-certificate-in-one-pkcs12-file)
+- [Help!](#help)
 
 <!-- Added by: humenius, at: Sun 26 Dec 2021 02:14:42 PM CET -->
 
@@ -59,6 +62,25 @@ We ship various flavors of this image - multi-arch, Docker (default) and Alpine.
 > **`alpine` notes!**
 >
 > Please note that when using the `alpine` variant, using the container restart functionality won't work due to missing Docker installation and will be skipped.
+
+## Environment Variables
+
+There are some environment variables if you want to customize various things inside the docker container:
+
+| Variable | Default | Value | Description |
+| -------- | ------- | ----- | ---------- |
+| `ACME_FILE_PATH` | `/traefik/acme.json` | `<filepath>` | Full filepath to traefiks certificates storage.
+| `CERTIFICATE_FILE_NAME` | `cert` | `<filename>` | The file name (without extension) of the generated certificates.
+| `CERTIFICATE_FILE_EXT` | `.pem` | `<extension>` | The file extension of the generated certificates.
+| `COMBINE_PKCS12` | unset | `yes` | If set to `yes` an additional combined PKCS12 file is created.
+| `DOMAIN` | unset | `<extension>` | Extract only for specified domains (comma-separated list) - instead of all.
+| `OVERRIDE_UID` | unset | `<number>` | Change ownership of certificate and key to given `UID`.
+| `OVERRIDE_GID` | unset | `<number>` | Change ownership of certificate and key to given `GID`.
+| `PKCS12_PASSWORD` | unset | `<password>` | Password for the combined PKCS12 , see also `COMBINE_PKCS12`.
+| `PRIVATEKEY_FILE_NAME` | `key` | `<filename>` | The file extension of the generated private keys.
+| `PRIVATEKEY_FILE_EXT` | `.pem` | `<extension>` | The file extension of the generated private keys.
+
+See below examples for usage.
 
 ## Basic setup
 Mount your ACME folder into `/traefik` and output folder to `/output`. Here's an example for docker-compose:

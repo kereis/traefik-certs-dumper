@@ -3,7 +3,15 @@
 workdir=/tmp/work
 outputdir=/output
 re='^[0-9]+$'
+
 acme_file_path=${ACME_FILE_PATH:-/traefik/acme.json}
+certificate_file_name=${CERTIFICATE_FILE_NAME:-cert}
+certificate_file_ext=${CERTIFICATE_FILE_EXT:-.pem}
+certificate_file=${certificate_file_name}${certificate_file_ext}
+privatekey_file_name=${PRIVATEKEY_FILE_NAME:-key}
+privatekey_file_ext= ${PRIVATEKEY_FILE_EXT:-.pem}
+privatekey_file= ${privatekey_file_name}${privatekey_file_ext}
+
 
 ###############################################
 ####             DUMPING LOGIC             ####
@@ -16,10 +24,10 @@ dump() {
   log "Dumping certificates"
   traefik-certs-dumper file \
     --version v2 \
-    --crt-name "cert" \
-    --crt-ext ".pem" \
-    --key-name "key" \
-    --key-ext ".pem" \
+    --crt-name ${certificate_file_name} \
+    --crt-ext ${certificate_file_ext} \
+    --key-name ${privatekey_file_name} \
+    --key-ext ${privatekey_file_ext} \
     --domain-subdir \
     --dest /tmp/work \
     --source ${acme_file_path} >/dev/null
@@ -32,17 +40,17 @@ dump() {
       # Don't extract "private" because it contains Let's Encrypt key
       if [[ "${i}" != "private" ]]; then
         if
-          [[ -f ${workdir}/${i}/cert.pem && -f ${workdir}/${i}/key.pem ]]
+          [[ -f ${workdir}/${i}/${certificate_file} && -f ${workdir}/${i}/${privatekey_file} ]]
         then
-          if [[ -f ${outputdir}/${i}/cert.pem && -f ${outputdir}/${i}/key.pem ]] &&
-            diff -q "${workdir}/$i/cert.pem" "${outputdir}/$i/cert.pem" >/dev/null &&
-            diff -q "${workdir}/$i/key.pem" "${outputdir}/$i/key.pem" >/dev/null; then
+          if [[ -f ${outputdir}/${i}/${certificate_file} && -f ${outputdir}/${i}/${privatekey_file} ]] &&
+            diff -q "${workdir}/$i/${certificate_file}" "${outputdir}/$i/${certificate_file}" >/dev/null &&
+            diff -q "${workdir}/$i/${privatekey_file}" "${outputdir}/$i/${privatekey_file}" >/dev/null; then
             log "Certificate and key for '${i}' still up to date, doing nothing"
           else
             log "Certificate or key for '${i}' differ, updating"
             diff_available=true
             local dir=${outputdir}/${i}
-            mkdir -p "${dir}" && mv ${workdir}/${i}/*.pem "${dir}"
+            mkdir -p "${dir}" && mv ${workdir}/${i}/${certificate_file} ${workdir}/${i}/${privatekey_file} "${dir}"
           fi
         else
           err "Certificates for domain '${i}' don't exist. Omitting..."
@@ -61,17 +69,17 @@ dump() {
     local diff_available=false
     for i in "${DOMAINS[@]}"; do
       if
-        [[ -f ${workdir}/${i}/cert.pem && -f ${workdir}/${i}/key.pem ]]
+        [[ -f ${workdir}/${i}/${certificate_file} && -f ${workdir}/${i}/${privatekey_file} ]]
       then
-        if [[ -f ${outputdir}/${i}/cert.pem && -f ${outputdir}/${i}/key.pem ]] &&
-          diff -q "${workdir}/$i/cert.pem" "${outputdir}/$i/cert.pem" >/dev/null &&
-          diff -q "${workdir}/$i/key.pem" "${outputdir}/$i/key.pem" >/dev/null; then
+        if [[ -f ${outputdir}/${i}/${certificate_file} && -f ${outputdir}/${i}/${privatekey_file} ]] &&
+          diff -q "${workdir}/$i/${certificate_file}" "${outputdir}/$i/${certificate_file}" >/dev/null &&
+          diff -q "${workdir}/$i/${privatekey_file}" "${outputdir}/$i/${privatekey_file}" >/dev/null; then
           log "Certificate and key for '${i}' still up to date, doing nothing"
         else
           log "Certificate or key for '${i}' differ, updating"
           diff_available=true
           local dir=${outputdir}/${i}
-          mkdir -p "${dir}" && mv ${workdir}/${i}/*.pem "${dir}"
+          mkdir -p "${dir}" && mv ${workdir}/${i}/${certificate_file} ${workdir}/${i}/${privatekey_file} "${dir}"
         fi
       else
         err "Certificates for domain '${i}' don't exist. Omitting..."
@@ -87,15 +95,15 @@ dump() {
     fi
   else
     if
-      [[ -f ${workdir}/${DOMAINS[0]}/cert.pem && -f ${workdir}/${DOMAINS[0]}/key.pem ]]
+      [[ -f ${workdir}/${DOMAINS[0]}/${certificate_file} && -f ${workdir}/${DOMAINS[0]}/${privatekey_file} ]]
     then
-      if [[ -f ${outputdir}/cert.pem && -f ${outputdir}/key.pem ]] &&
-        diff -q "${workdir}/${DOMAINS[0]}/cert.pem" "${outputdir}/cert.pem" >/dev/null &&
-        diff -q "${workdir}/${DOMAINS[0]}/key.pem" "${outputdir}/key.pem" >/dev/null; then
+      if [[ -f ${outputdir}/${certificate_file} && -f ${outputdir}/${privatekey_file} ]] &&
+        diff -q "${workdir}/${DOMAINS[0]}/${certificate_file}" "${outputdir}/${certificate_file}" >/dev/null &&
+        diff -q "${workdir}/${DOMAINS[0]}/${privatekey_file}" "${outputdir}/${privatekey_file}" >/dev/null; then
         log "Certificate and key for '${DOMAINS[0]}' still up to date, doing nothing"
       else
         log "Certificate or key for '${DOMAINS[0]}' differ, updating"
-        mv ${workdir}/${DOMAINS[0]}/*.pem "${outputdir}/"
+        mv ${workdir}/${DOMAINS[0]}/${certificate_file} ${workdir}/${DOMAINS[0]}/${privatekey_file} "${outputdir}/"
         combine_pkcs12
         combine_pem
         change_ownership
@@ -116,15 +124,15 @@ combine_pem() {
     else
       if [[ "${#DOMAINS[@]}" -gt 1 ]]; then
         for i in "${DOMAINS[@]}"; do
-          if [[ -f ${outputdir}/${i}/cert.pem && -f ${outputdir}/${i}/key.pem ]]; then
+          if [[ -f ${outputdir}/${i}/${certificate_file} && -f ${outputdir}/${i}/${privatekey_file} ]]; then
             log "Combining key and cert for domain ${i} to single pem with name ${i}/${COMBINED_PEM}"
-            cat ${outputdir}/"${i}"/cert.pem ${outputdir}/"${i}"/key.pem >${outputdir}/"${i}"/"${COMBINED_PEM}"
+            cat ${outputdir}/"${i}"/${certificate_file} ${outputdir}/"${i}"/${privatekey_file} >${outputdir}/"${i}"/"${COMBINED_PEM}"
           fi
         done
       else
-        if [[ -f ${outputdir}/cert.pem && -f ${outputdir}/key.pem ]]; then
+        if [[ -f ${outputdir}/${certificate_file} && -f ${outputdir}/${privatekey_file} ]]; then
           log "Combining key and cert to single pem with name ${COMBINED_PEM}"
-          cat ${outputdir}/cert.pem ${outputdir}/key.pem >${outputdir}/"${COMBINED_PEM}"
+          cat ${outputdir}/${certificate_file} ${outputdir}/${privatekey_file} >${outputdir}/"${COMBINED_PEM}"
         fi
       fi
     fi
@@ -144,15 +152,15 @@ combine_pkcs12() {
     local outputdir_subdirs=(${outputdir}/*/)
     for subdir in "${outputdir_subdirs[@]}"; do
       local i=$(basename "${subdir}" /)
-      if [[ -f ${outputdir}/${i}/cert.pem && -f ${outputdir}/${i}/key.pem ]]; then
+      if [[ -f ${outputdir}/${i}/${certificate_file} && -f ${outputdir}/${i}/${privatekey_file} ]]; then
         log "Combining key and cert for domain ${i} to pkcs12 file"
-        openssl pkcs12 -export -in ${outputdir}/"${i}"/cert.pem -inkey ${outputdir}/"${i}"/key.pem -out ${outputdir}/"${i}"/cert.p12 -password pass:"${PKCS12_PASSWORD}"
+        openssl pkcs12 -export -in ${outputdir}/"${i}"/${certificate_file} -inkey ${outputdir}/"${i}"/${privatekey_file} -out ${outputdir}/"${i}"/cert.p12 -password pass:"${PKCS12_PASSWORD}"
       fi
     done
   else
-    if [[ -f ${outputdir}/cert.pem && -f ${outputdir}/key.pem ]]; then
+    if [[ -f ${outputdir}/${certificate_file} && -f ${outputdir}/${privatekey_file} ]]; then
       log "Combining key and cert to PKCS12 file"
-      openssl pkcs12 -export -in ${outputdir}/cert.pem -inkey ${outputdir}/key.pem -out ${outputdir}/cert.p12 -password pass:"${PKCS12_PASSWORD}"
+      openssl pkcs12 -export -in ${outputdir}/${certificate_file} -inkey ${outputdir}/${privatekey_file} -out ${outputdir}/cert.p12 -password pass:"${PKCS12_PASSWORD}"
     fi
   fi
 }
@@ -171,7 +179,7 @@ change_ownership() {
       log "Combination ${OVERRIDE_UID}:${OVERRIDE_GID} is invalid. Skipping file ownership change..."
     else
       log "Changing ownership of certificates and keys"
-      find ${outputdir}/ -type f \( -name "*.pem" -o -name "*.p12" \) | while read -r f; do
+      find ${outputdir}/ -type f \( -name "*${certificate_file_ext}" -o -name "*${privatekey_file_ext}" -o -name "*.p12" \) | while read -r f; do
         chown "${OVERRIDE_UID}":"${OVERRIDE_GID}" "$f"
         chmod g+r "$f"
       done
