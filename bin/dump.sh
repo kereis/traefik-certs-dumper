@@ -61,6 +61,7 @@ dump() {
     if [[ "${diff_available}" = true ]]; then
       combine_pkcs12
       combine_pem
+      convert_key2rsa
       change_ownership
       restart_containers
       restart_services
@@ -89,6 +90,7 @@ dump() {
     if [[ "${diff_available}" = true ]]; then
       combine_pkcs12
       combine_pem
+      convert_key2rsa
       change_ownership
       restart_containers
       restart_services
@@ -106,6 +108,7 @@ dump() {
         mv ${workdir}/"${DOMAINS[0]}"/"${certificate_file}" ${workdir}/"${DOMAINS[0]}"/"${privatekey_file}" "${outputdir}/"
         combine_pkcs12
         combine_pem
+        convert_key2rsa
         change_ownership
         restart_containers
         restart_services
@@ -161,6 +164,28 @@ combine_pkcs12() {
     if [[ -f ${outputdir}/${certificate_file} && -f ${outputdir}/${privatekey_file} ]]; then
       log "Combining key and cert to PKCS12 file"
       openssl pkcs12 -export -in ${outputdir}/"${certificate_file}" -inkey ${outputdir}/"${privatekey_file}" -out ${outputdir}/cert.p12 -password pass:"${PKCS12_PASSWORD}"
+    fi
+  fi
+}
+
+convert_key2rsa() {
+  if [[ "${CONVERT_KEY2RSA}" != yes ]]; then
+    return
+  fi
+
+  if [[ -z "${DOMAIN}" || "${#DOMAINS[@]}" -gt 1 ]]; then
+    local outputdir_subdirs=(${outputdir}/*/)
+    for subdir in "${outputdir_subdirs[@]}"; do
+      local i=$(basename "${subdir}" /)
+      if [[ -f ${outputdir}/${i}/cert.pem && -f ${outputdir}/${i}/key.pem ]]; then
+        log "Converting key for domain ${i} to RSA key file"
+        openssl rsa -in ${outputdir}/"${i}"/key.pem -out ${outputdir}/"${i}"/rsakey.pem
+      fi
+    done
+  else
+    if [[ -f ${outputdir}/cert.pem && -f ${outputdir}/key.pem ]]; then
+      log "Converting key to RSA key file"
+      openssl rsa -in ${outputdir}/"${i}"/key.pem -out ${outputdir}/"${i}"/rsakey.pem
     fi
   fi
 }
