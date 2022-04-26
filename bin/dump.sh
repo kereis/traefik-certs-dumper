@@ -61,7 +61,7 @@ dump() {
     if [[ "${diff_available}" = true ]]; then
       combine_pkcs12
       combine_pem
-      convert_key2rsa
+      convert_keys_to_rsa
       change_ownership
       restart_containers
       restart_services
@@ -90,7 +90,7 @@ dump() {
     if [[ "${diff_available}" = true ]]; then
       combine_pkcs12
       combine_pem
-      convert_key2rsa
+      convert_keys_to_rsa
       change_ownership
       restart_containers
       restart_services
@@ -108,7 +108,7 @@ dump() {
         mv ${workdir}/"${DOMAINS[0]}"/"${certificate_file}" ${workdir}/"${DOMAINS[0]}"/"${privatekey_file}" "${outputdir}/"
         combine_pkcs12
         combine_pem
-        convert_key2rsa
+        convert_keys_to_rsa
         change_ownership
         restart_containers
         restart_services
@@ -168,8 +168,8 @@ combine_pkcs12() {
   fi
 }
 
-convert_key2rsa() {
-  if [[ "${CONVERT_KEY2RSA}" != yes ]]; then
+convert_keys_to_rsa() {
+  if [[ "${CONVERT_KEYS_TO_RSA}" != yes ]]; then
     return
   fi
 
