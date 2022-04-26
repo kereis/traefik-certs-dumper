@@ -8,9 +8,9 @@ acme_file_path=${ACME_FILE_PATH:-/traefik/acme.json}
 certificate_file_name=${CERTIFICATE_FILE_NAME:-cert}
 certificate_file_ext=${CERTIFICATE_FILE_EXT:-.pem}
 certificate_file=${certificate_file_name}${certificate_file_ext}
-privatekey_file_name=${PRIVATEKEY_FILE_NAME:-key}
-privatekey_file_ext= ${PRIVATEKEY_FILE_EXT:-.pem}
-privatekey_file= ${privatekey_file_name}${privatekey_file_ext}
+privatekey_file_name=${PRIVATE_KEY_FILE_NAME:-key}
+privatekey_file_ext=${PRIVATEK_EY_FILE_EXT:-.pem}
+privatekey_file=${privatekey_file_name}${privatekey_file_ext}
 
 
 ###############################################
@@ -24,13 +24,13 @@ dump() {
   log "Dumping certificates"
   traefik-certs-dumper file \
     --version v2 \
-    --crt-name ${certificate_file_name} \
-    --crt-ext ${certificate_file_ext} \
-    --key-name ${privatekey_file_name} \
-    --key-ext ${privatekey_file_ext} \
+    --crt-name "${certificate_file_name}" \
+    --crt-ext "${certificate_file_ext}" \
+    --key-name "${privatekey_file_name}" \
+    --key-ext "${privatekey_file_ext}" \
     --domain-subdir \
     --dest /tmp/work \
-    --source ${acme_file_path} >/dev/null
+    --source "${acme_file_path}" >/dev/null
 
   if [[ -z "${DOMAIN}" ]]; then
     local diff_available=false

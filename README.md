@@ -18,6 +18,7 @@ traefik-certs-dumper
 Dumps Let's Encrypt certificates of a specified domain to `.pem` and `.key` files which Traefik stores in `acme.json`.
 
 This image uses:
+
 - a bash script that derivates from [mailu/traefik-certdumper](https://hub.docker.com/r/mailu/traefik-certdumper)
 - [ldez's traefik-certs-dumper](https://github.com/ldez/traefik-certs-dumper)
 
@@ -65,20 +66,20 @@ We ship various flavors of this image - multi-arch, Docker (default) and Alpine.
 
 ## Environment Variables
 
-There are some environment variables if you want to customize various things inside the docker container:
+There are some environment variables if you want to customize various things inside the Docker container:
 
 | Variable | Default | Value | Description |
 | -------- | ------- | ----- | ---------- |
-| `ACME_FILE_PATH` | `/traefik/acme.json` | `<filepath>` | Full filepath to traefiks certificates storage.
+| `ACME_FILE_PATH` | `/traefik/acme.json` | `<filepath>` | Full file path to Traefik's certificates storage.
 | `CERTIFICATE_FILE_NAME` | `cert` | `<filename>` | The file name (without extension) of the generated certificates.
 | `CERTIFICATE_FILE_EXT` | `.pem` | `<extension>` | The file extension of the generated certificates.
-| `COMBINE_PKCS12` | unset | `yes` | If set to `yes` an additional combined PKCS12 file is created.
+| `COMBINE_PKCS12` | unset | `yes` | If set to `yes`, an additional combined PKCS12 file is created.
 | `DOMAIN` | unset | `<extension>` | Extract only for specified domains (comma-separated list) - instead of all.
 | `OVERRIDE_UID` | unset | `<number>` | Change ownership of certificate and key to given `UID`.
 | `OVERRIDE_GID` | unset | `<number>` | Change ownership of certificate and key to given `GID`.
-| `PKCS12_PASSWORD` | unset | `<password>` | Password for the combined PKCS12 , see also `COMBINE_PKCS12`.
-| `PRIVATEKEY_FILE_NAME` | `key` | `<filename>` | The file extension of the generated private keys.
-| `PRIVATEKEY_FILE_EXT` | `.pem` | `<extension>` | The file extension of the generated private keys.
+| `PKCS12_PASSWORD` | unset | `<password>` | Password for the combined PKCS12, see also `COMBINE_PKCS12`.
+| `PRIVATE_KEY_FILE_NAME` | `key` | `<filename>` | The file name (without extension) of the generated private keys.
+| `PRIVATE_KEY_FILE_EXT` | `.pem` | `<extension>` | The file extension of the generated private keys.
 
 See below examples for usage.
 
