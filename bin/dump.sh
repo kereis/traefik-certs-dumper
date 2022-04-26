@@ -34,7 +34,7 @@ dump() {
 
   if [[ -z "${DOMAIN}" ]]; then
     local diff_available=false
-    local workdir_subdirs=(${workdir}/*/)
+    local workdir_subdirs=("${workdir}"/*/)
     for subdir in "${workdir_subdirs[@]}"; do
       local i=$(basename "${subdir}" /)
       # Don't extract "private" because it contains Let's Encrypt key
@@ -50,7 +50,7 @@ dump() {
             log "Certificate or key for '${i}' differ, updating"
             diff_available=true
             local dir=${outputdir}/${i}
-            mkdir -p "${dir}" && mv ${workdir}/${i}/${certificate_file} ${workdir}/${i}/${privatekey_file} "${dir}"
+            mkdir -p "${dir}" && mv ${workdir}/"${i}"/"${certificate_file}" ${workdir}/"${i}"/"${privatekey_file}" "${dir}"
           fi
         else
           err "Certificates for domain '${i}' don't exist. Omitting..."
@@ -79,7 +79,7 @@ dump() {
           log "Certificate or key for '${i}' differ, updating"
           diff_available=true
           local dir=${outputdir}/${i}
-          mkdir -p "${dir}" && mv ${workdir}/${i}/${certificate_file} ${workdir}/${i}/${privatekey_file} "${dir}"
+          mkdir -p "${dir}" && mv ${workdir}/"${i}"/"${certificate_file}" ${workdir}/"${i}"/"${privatekey_file}" "${dir}"
         fi
       else
         err "Certificates for domain '${i}' don't exist. Omitting..."
@@ -103,7 +103,7 @@ dump() {
         log "Certificate and key for '${DOMAINS[0]}' still up to date, doing nothing"
       else
         log "Certificate or key for '${DOMAINS[0]}' differ, updating"
-        mv ${workdir}/${DOMAINS[0]}/${certificate_file} ${workdir}/${DOMAINS[0]}/${privatekey_file} "${outputdir}/"
+        mv ${workdir}/"${DOMAINS[0]}"/"${certificate_file}" ${workdir}/"${DOMAINS[0]}"/"${privatekey_file}" "${outputdir}/"
         combine_pkcs12
         combine_pem
         change_ownership
@@ -126,13 +126,13 @@ combine_pem() {
         for i in "${DOMAINS[@]}"; do
           if [[ -f ${outputdir}/${i}/${certificate_file} && -f ${outputdir}/${i}/${privatekey_file} ]]; then
             log "Combining key and cert for domain ${i} to single pem with name ${i}/${COMBINED_PEM}"
-            cat ${outputdir}/"${i}"/${certificate_file} ${outputdir}/"${i}"/${privatekey_file} >${outputdir}/"${i}"/"${COMBINED_PEM}"
+            cat ${outputdir}/"${i}"/"${certificate_file}" ${outputdir}/"${i}"/"${privatekey_file}" >${outputdir}/"${i}"/"${COMBINED_PEM}"
           fi
         done
       else
         if [[ -f ${outputdir}/${certificate_file} && -f ${outputdir}/${privatekey_file} ]]; then
           log "Combining key and cert to single pem with name ${COMBINED_PEM}"
-          cat ${outputdir}/${certificate_file} ${outputdir}/${privatekey_file} >${outputdir}/"${COMBINED_PEM}"
+          cat ${outputdir}/"${certificate_file}" ${outputdir}/"${privatekey_file}" >${outputdir}/"${COMBINED_PEM}"
         fi
       fi
     fi
@@ -145,22 +145,22 @@ combine_pkcs12() {
   fi
 
   if [[ -z ${PKCS12_PASSWORD+x} && -n ${PKCS12_PASSWORD_FILE+x} ]]; then
-    PKCS12_PASSWORD=$(cat $PKCS12_PASSWORD_FILE)
+    PKCS12_PASSWORD=$(cat "$PKCS12_PASSWORD_FILE")
   fi
 
   if [[ -z "${DOMAIN}" || "${#DOMAINS[@]}" -gt 1 ]]; then
-    local outputdir_subdirs=(${outputdir}/*/)
+    local outputdir_subdirs=("${outputdir}"/*/)
     for subdir in "${outputdir_subdirs[@]}"; do
       local i=$(basename "${subdir}" /)
       if [[ -f ${outputdir}/${i}/${certificate_file} && -f ${outputdir}/${i}/${privatekey_file} ]]; then
         log "Combining key and cert for domain ${i} to pkcs12 file"
-        openssl pkcs12 -export -in ${outputdir}/"${i}"/${certificate_file} -inkey ${outputdir}/"${i}"/${privatekey_file} -out ${outputdir}/"${i}"/cert.p12 -password pass:"${PKCS12_PASSWORD}"
+        openssl pkcs12 -export -in ${outputdir}/"${i}"/"${certificate_file}" -inkey ${outputdir}/"${i}"/"${privatekey_file}" -out ${outputdir}/"${i}"/cert.p12 -password pass:"${PKCS12_PASSWORD}"
       fi
     done
   else
     if [[ -f ${outputdir}/${certificate_file} && -f ${outputdir}/${privatekey_file} ]]; then
       log "Combining key and cert to PKCS12 file"
-      openssl pkcs12 -export -in ${outputdir}/${certificate_file} -inkey ${outputdir}/${privatekey_file} -out ${outputdir}/cert.p12 -password pass:"${PKCS12_PASSWORD}"
+      openssl pkcs12 -export -in ${outputdir}/"${certificate_file}" -inkey ${outputdir}/"${privatekey_file}" -out ${outputdir}/cert.p12 -password pass:"${PKCS12_PASSWORD}"
     fi
   fi
 }
@@ -259,7 +259,7 @@ check_cmd() {
   local cmd=$1
 
   #check command exist, but no output
-  command -v $1 >/dev/null 
+  command -v "$cmd" >/dev/null 
 
   local _result=$?
   if ((_result == 1)); then
