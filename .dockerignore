@@ -5,3 +5,4 @@
 .gitmodules
 **/Dockerfile
 **/docker-compose.yml
+/dev
