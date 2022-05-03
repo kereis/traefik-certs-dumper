@@ -183,7 +183,7 @@ convert_keys_to_rsa() {
       fi
     done
   else
-    if [[ -f ${outputdir}/cert.pem && -f ${outputdir}/key.pem ]]; then
+    if [[ -f "${outputdir}/${certificate_file}" && -f "${outputdir}/${privatekey_file}" ]]; then
       log "Converting key to RSA key file"
       openssl rsa -in ${outputdir}/"${i}"/key.pem -out ${outputdir}/"${i}"/rsakey.pem
     fi
