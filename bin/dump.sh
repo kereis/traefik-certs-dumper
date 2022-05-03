@@ -9,8 +9,11 @@ certificate_file_name=${CERTIFICATE_FILE_NAME:-cert}
 certificate_file_ext=${CERTIFICATE_FILE_EXT:-.pem}
 certificate_file=${certificate_file_name}${certificate_file_ext}
 privatekey_file_name=${PRIVATE_KEY_FILE_NAME:-key}
-privatekey_file_ext=${PRIVATEK_EY_FILE_EXT:-.pem}
+privatekey_file_ext=${PRIVATE_KEY_FILE_EXT:-.pem}
 privatekey_file=${privatekey_file_name}${privatekey_file_ext}
+rsakey_file_name=${RSA_KEY_FILE_NAME:-rsakey}
+rsakey_file_ext=${RSA_KEY_FILE_EXT:-.pem}
+rsakey_file=${rsakey_file_name}${rsakey_file_ext}
 
 
 ###############################################
@@ -179,13 +182,13 @@ convert_keys_to_rsa() {
       local i=$(basename "${subdir}" /)
       if [[ -f "${outputdir}/${i}/${certificate_file}" && -f "${outputdir}/${i}/${privatekey_file}" ]]; then
         log "Converting key for domain ${i} to RSA key file"
-        openssl rsa -in "${outputdir}/${i}/${privatekey_file}" -out "${outputdir}/${i}/rsakey.pem"
+        openssl rsa -in "${outputdir}/${i}/${privatekey_file}" -out "${outputdir}/${i}/${rsakey_file}"
       fi
     done
   else
     if [[ -f "${outputdir}/${certificate_file}" && -f "${outputdir}/${privatekey_file}" ]]; then
       log "Converting key to RSA key file"
-      openssl rsa -in ${outputdir}/"${i}"/key.pem -out ${outputdir}/"${i}"/rsakey.pem
+      openssl rsa -in ${outputdir}/"${i}"/"${privatekey_file}" -out ${outputdir}/"${i}"/"${rsakey_file}"
     fi
   fi
 }
