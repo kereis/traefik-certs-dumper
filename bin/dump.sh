@@ -177,7 +177,7 @@ convert_keys_to_rsa() {
     local outputdir_subdirs=(${outputdir}/*/)
     for subdir in "${outputdir_subdirs[@]}"; do
       local i=$(basename "${subdir}" /)
-      if [[ -f ${outputdir}/${i}/cert.pem && -f ${outputdir}/${i}/key.pem ]]; then
+      if [[ -f "${outputdir}/${i}/${certificate_file}" && -f "${outputdir}/${i}/${privatekey_file}" ]]; then
         log "Converting key for domain ${i} to RSA key file"
         openssl rsa -in ${outputdir}/"${i}"/key.pem -out ${outputdir}/"${i}"/rsakey.pem
       fi
