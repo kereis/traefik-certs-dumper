@@ -74,12 +74,16 @@ There are some environment variables if you want to customize various things ins
 | `CERTIFICATE_FILE_NAME` | `cert`               | `<filename>`  | The file name (without extension) of the generated certificates.            |
 | `CERTIFICATE_FILE_EXT`  | `.pem`               | `<extension>` | The file extension of the generated certificates.                           |
 | `COMBINE_PKCS12`        | unset                | `yes`         | If set to `yes`, an additional combined PKCS12 file is created.             |
+| `CONVERT_KEYS_TO_RSA`   | unset                | `yes`         | If set to `yes`, keys are created in RSA format also.             |
 | `DOMAIN`                | unset                | `<extension>` | Extract only for specified domains (comma-separated list) - instead of all. |
 | `OVERRIDE_UID`          | unset                | `<number>`    | Change ownership of certificate and key to given `UID`.                     |
 | `OVERRIDE_GID`          | unset                | `<number>`    | Change ownership of certificate and key to given `GID`.                     |
 | `PKCS12_PASSWORD`       | unset                | `<password>`  | Password for the combined PKCS12, see also `COMBINE_PKCS12`.                |
 | `PRIVATE_KEY_FILE_NAME` | `key`                | `<filename>`  | The file name (without extension) of the generated private keys.            |
 | `PRIVATE_KEY_FILE_EXT`  | `.pem`               | `<extension>` | The file extension of the generated private keys.                           |
+| `RSA_KEY_FILE_NAME`     | `rsakey`             | `<filename>`  | The file name (without extension) of the generated private keys in RSA format, see also `CONVERT_KEYS_TO_RSA`. |
+| `RSA_KEY_FILE_EXT`      | `.pem`               | `<extension>` | The file extension of the generated private keys in RSA format, see also `CONVERT_KEYS_TO_RSA`. | 
+
 
 See below examples for usage.
 
