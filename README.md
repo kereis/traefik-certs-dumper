@@ -277,6 +277,31 @@ secrets:
     file: /path/to/secret/PKCS12_PASSWORD
 ```
 
+### Convert keys in RSA format
+
+Some applications like [mySQL](https://www.mysql.com/) or [mariaDB](https://mariadb.org/) need their keys in RSA format. In this case, you can set the environment variable `CONVERT_KEYS_TO_RSA`. Each time `traefik-certs-dumper` dumps the certificates, this script will create a file named `rsakey.pem` in each domain's folder respectively. If required, this file name can be configured using the environment variables `RSA_KEY_FILE_NAME` und `RSA_KEY_FILE_EXT`.
+
+
+```yaml
+version: '3.7'
+
+services:
+  certdumper:
+    image: humenius/traefik-certs-dumper:latest
+    container_name: traefik_certdumper
+    network_mode: none
+    volumes:
+      - ./traefik/acme:/traefik:ro
+      - ./output:/output:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      CONVERT_KEYS_TO_RSA: "yes"
+      RSA_KEY_FILE_NAME: "myrsa"
+      RSA_KEY_FILE_EXT: ".ext"
+
+```
+
+
 ## Help!
 
 If you need help using this image, have suggestions or want to report a problem, feel free to open an issue on GitHub!
