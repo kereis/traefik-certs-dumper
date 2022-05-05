@@ -74,12 +74,16 @@ There are some environment variables if you want to customize various things ins
 | `CERTIFICATE_FILE_NAME` | `cert`               | `<filename>`  | The file name (without extension) of the generated certificates.            |
 | `CERTIFICATE_FILE_EXT`  | `.pem`               | `<extension>` | The file extension of the generated certificates.                           |
 | `COMBINE_PKCS12`        | unset                | `yes`         | If set to `yes`, an additional combined PKCS12 file is created.             |
+| `CONVERT_KEYS_TO_RSA`   | unset                | `yes`         | If set to `yes`, keys are created in RSA format also.             |
 | `DOMAIN`                | unset                | `<extension>` | Extract only for specified domains (comma-separated list) - instead of all. |
 | `OVERRIDE_UID`          | unset                | `<number>`    | Change ownership of certificate and key to given `UID`.                     |
 | `OVERRIDE_GID`          | unset                | `<number>`    | Change ownership of certificate and key to given `GID`.                     |
 | `PKCS12_PASSWORD`       | unset                | `<password>`  | Password for the combined PKCS12, see also `COMBINE_PKCS12`.                |
 | `PRIVATE_KEY_FILE_NAME` | `key`                | `<filename>`  | The file name (without extension) of the generated private keys.            |
 | `PRIVATE_KEY_FILE_EXT`  | `.pem`               | `<extension>` | The file extension of the generated private keys.                           |
+| `RSA_KEY_FILE_NAME`     | `rsakey`             | `<filename>`  | The file name (without extension) of the generated private keys in RSA format, see also `CONVERT_KEYS_TO_RSA`. |
+| `RSA_KEY_FILE_EXT`      | `.pem`               | `<extension>` | The file extension of the generated private keys in RSA format, see also `CONVERT_KEYS_TO_RSA`. | 
+
 
 See below examples for usage.
 
@@ -272,6 +276,31 @@ secrets:
   pkcs12_password:
     file: /path/to/secret/PKCS12_PASSWORD
 ```
+
+### Convert keys in RSA format
+
+Some applications like [mySQL](https://www.mysql.com/) or [mariaDB](https://mariadb.org/) need their keys in RSA format. In this case, you can set the environment variable `CONVERT_KEYS_TO_RSA`. Each time `traefik-certs-dumper` dumps the certificates, this script will create a file named `rsakey.pem` in each domain's folder respectively. If required, this file name can be configured using the environment variables `RSA_KEY_FILE_NAME` und `RSA_KEY_FILE_EXT`.
+
+
+```yaml
+version: '3.7'
+
+services:
+  certdumper:
+    image: humenius/traefik-certs-dumper:latest
+    container_name: traefik_certdumper
+    network_mode: none
+    volumes:
+      - ./traefik/acme:/traefik:ro
+      - ./output:/output:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      CONVERT_KEYS_TO_RSA: "yes"
+      RSA_KEY_FILE_NAME: "myrsa"
+      RSA_KEY_FILE_EXT: ".ext"
+
+```
+
 
 ## Help!
 
