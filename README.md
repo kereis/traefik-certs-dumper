@@ -280,7 +280,7 @@ secrets:
 
 ### Convert keys in RSA format
 
-Some applications like [mySQL](https://www.mysql.com/) or [mariaDB](https://mariadb.org/) need their keys in RSA format. In this case, you can set the environment variable `CONVERT_KEYS_TO_RSA`. Each time `traefik-certs-dumper` dumps the certificates, this script will create a file named `rsakey.pem` in each domain's folder respectively. If required, this file name can be configured using the environment variables `RSA_KEY_FILE_NAME` and `RSA_KEY_FILE_EXT`.
+Some applications like [MySQL](https://www.mysql.com/) or [mariaDB](https://mariadb.org/) need their keys in RSA format. In this case, you can set the environment variable `CONVERT_KEYS_TO_RSA`. Each time `traefik-certs-dumper` dumps the certificates, this script will create a file named `rsakey.pem` in each domain's folder respectively. If required, this file name can be configured using the environment variables `RSA_KEY_FILE_NAME` and `RSA_KEY_FILE_EXT`.
 
 
 ```yaml
