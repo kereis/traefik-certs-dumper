@@ -42,7 +42,7 @@ Special thanks to them!
   - [Health Check](#health-check)
   - [Merging private key and public certificate in one .pem](#merging-private-key-and-public-certificate-in-one-pem)
   - [Merging private key and public certificate in one PKCS12 file](#merging-private-key-and-public-certificate-in-one-pkcs12-file)
-  - [Convert Keys in RSA Format](#convert-keys-in-rsa-format)  
+  - [Convert Keys in RSA format](#convert-keys-in-rsa-format)
 - [Help!](#help)
 
 <!-- Added by: humenius, at: Sun 26 Dec 2021 02:14:42 PM CET -->
