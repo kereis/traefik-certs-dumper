@@ -1,4 +1,4 @@
-FROM ldez/traefik-certs-dumper:v2.7.4-arm.v8
+FROM ldez/traefik-certs-dumper:v2.8.1-arm.v8
 LABEL maintainer="kereis <kreis-dev@gmx.net>"
 
 COPY --from=multiarch/qemu-user-static:x86_64-aarch64 \
