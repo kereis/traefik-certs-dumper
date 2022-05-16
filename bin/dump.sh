@@ -412,5 +412,7 @@ while true; do
     if [[ $? -eq 0 ]]; then
       dump
     fi
+  else
+    sleep 10
   fi
 done
