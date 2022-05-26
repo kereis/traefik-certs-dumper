@@ -413,6 +413,7 @@ while true; do
       dump
     fi
   else
+    log "${acme_file_path} is not a file. Retrying..."
     sleep 10
   fi
 done
