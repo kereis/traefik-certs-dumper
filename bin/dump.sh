@@ -407,6 +407,13 @@ mkdir -p ${workdir}
 dump
 
 while true; do
-  inotifywait -qq -e modify "${acme_file_path}"
-  dump
+  if [[ -f ${acme_file_path} ]]; then
+    inotifywait -qq -e modify "${acme_file_path}"  
+    if [[ $? -eq 0 ]]; then
+      dump
+    fi
+  else
+    log "${acme_file_path} is not a file. Retrying..."
+    sleep 10
+  fi
 done
