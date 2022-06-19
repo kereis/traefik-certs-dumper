@@ -5,7 +5,7 @@ outputdir=/output
 re='^[0-9]+$'
 
 acme_file_path=${ACME_FILE_PATH:-/traefik/acme.json}
-posthook_file_path=${ACME_FILE_PATH:-/hook/hook.sh}
+posthook_file_path=${POST_HOOK_FILE_PATH:-/hook/hook.sh}
 certificate_file_name=${CERTIFICATE_FILE_NAME:-cert}
 certificate_file_ext=${CERTIFICATE_FILE_EXT:-.pem}
 certificate_file=${certificate_file_name}${certificate_file_ext}
@@ -222,7 +222,7 @@ change_ownership() {
 post_hook() {
   if [[ -x ${posthook_file_path} ]]; then
     log "Post hook script file found. Executing"
-    sh ${posthook_file_path}
+    sh "${posthook_file_path}"
   fi
 }
 
