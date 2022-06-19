@@ -80,6 +80,7 @@ There are some environment variables if you want to customize various things ins
 | `OVERRIDE_UID`          | unset                | `<number>`    | Change ownership of certificate and key to given `UID`.                     |
 | `OVERRIDE_GID`          | unset                | `<number>`    | Change ownership of certificate and key to given `GID`.                     |
 | `PKCS12_PASSWORD`       | unset                | `<password>`  | Password for the combined PKCS12, see also `COMBINE_PKCS12`.                |
+| `POST_HOOK_FILE_PATH`   | `/hook/hook.sh`      | `<filepath>`  | Full file path to the post hook script that should be executed after dumping process |
 | `PRIVATE_KEY_FILE_NAME` | `key`                | `<filename>`  | The file name (without extension) of the generated private keys.            |
 | `PRIVATE_KEY_FILE_EXT`  | `.pem`               | `<extension>` | The file extension of the generated private keys.                           |
 | `RSA_KEY_FILE_NAME`     | `rsakey`             | `<filename>`  | The file name (without extension) of the generated private keys in RSA format, see also `CONVERT_KEYS_TO_RSA`. |
@@ -302,6 +303,45 @@ services:
 
 ```
 
+### Post-hook script
+
+You can run a script after the dumping process. Simply create a shell script and mount it to your container (target by default: `/hook/hook.sh`). You can override the file path to the post-hook script inside the container via environment variable `POST_HOOK_FILE_PATH` if necessary.
+
+```bash
+#!/bin/bash
+# Example post-hook.sh
+touch /output/posthook.example
+```
+
+```yaml
+# With default POST_HOOK_FILE_PATH
+version: '3.7'
+
+services:
+  certdumper:
+    image: humenius/traefik-certs-dumper:latest
+    volumes:
+      - ./traefik/acme:/traefik:ro
+      - ./output:/output:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./hook.sh:/hook/hook.sh:ro
+```
+
+```yaml
+# With custom POST_HOOK_FILE_PATH
+version: '3.7'
+
+services:
+  certdumper:
+    image: humenius/traefik-certs-dumper:latest
+    volumes:
+      - ./traefik/acme:/traefik:ro
+      - ./output:/output:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./hook.sh:/to/my/custom/hook.sh:ro
+    environment:
+      POST_HOOK_FILE_PATH: "/to/my/custom/hook.sh"
+```
 
 ## Help!
 
