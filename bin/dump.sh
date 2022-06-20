@@ -221,8 +221,13 @@ change_ownership() {
 
 post_hook() {
   if [[ -x ${posthook_file_path} ]]; then
-    log "Post hook script file found. Executing"
-    sh "${posthook_file_path}"
+    log "Post-hook script file found: ${posthook_file_path}. Executing"
+    
+    if sh "${posthook_file_path}"; then
+      log "Post-hook script file ${posthook_file_path} exited successfully."
+    else
+      err "Post-hook script file ${posthook_file_path} exited with error. Please check logs or your post-hook script for errors."
+    fi
   fi
 }
 
