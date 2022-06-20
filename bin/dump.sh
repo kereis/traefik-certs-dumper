@@ -5,6 +5,7 @@ outputdir=/output
 re='^[0-9]+$'
 
 acme_file_path=${ACME_FILE_PATH:-/traefik/acme.json}
+posthook_file_path=${POST_HOOK_FILE_PATH:-/hook/hook.sh}
 certificate_file_name=${CERTIFICATE_FILE_NAME:-cert}
 certificate_file_ext=${CERTIFICATE_FILE_EXT:-.pem}
 certificate_file=${certificate_file_name}${certificate_file_ext}
@@ -66,6 +67,7 @@ dump() {
       combine_pem
       convert_keys_to_rsa
       change_ownership
+      post_hook
       restart_containers
       restart_services
     fi
@@ -95,6 +97,7 @@ dump() {
       combine_pem
       convert_keys_to_rsa
       change_ownership
+      post_hook
       restart_containers
       restart_services
     fi
@@ -113,6 +116,7 @@ dump() {
         combine_pem
         convert_keys_to_rsa
         change_ownership
+        post_hook
         restart_containers
         restart_services
       fi
@@ -211,6 +215,18 @@ change_ownership() {
         chown "${OVERRIDE_UID}":"${OVERRIDE_GID}" "$f"
         chmod g+r "$f"
       done
+    fi
+  fi
+}
+
+post_hook() {
+  if [[ -x ${posthook_file_path} ]]; then
+    log "Post-hook script file found: ${posthook_file_path}. Executing"
+    
+    if sh "${posthook_file_path}"; then
+      log "Post-hook script file ${posthook_file_path} exited successfully."
+    else
+      err "Post-hook script file ${posthook_file_path} exited with error. Please check logs or your post-hook script for errors."
     fi
   fi
 }
