@@ -55,6 +55,7 @@ Special thanks to them!
 ### Image choice
 
 #### Releases
+
 We ship various flavors of this image - multi-arch, Docker (default) and Alpine. The versioning follows [SemVer](https://semver.org/).
 
 |                     | amd64 (default)           | arm32v7 | arm64v8 |
@@ -67,7 +68,8 @@ We ship various flavors of this image - multi-arch, Docker (default) and Alpine.
 > Please note that when using the `alpine` variant, using the container restart functionality won't work due to missing Docker installation and will be skipped.
 
 #### Edge builds
-If you don't want to wait for a release or want to test new "bleeding-edge" functionalities of branch `develop`, you can use the tag `edge`. 
+
+If you don't want to wait for a release or want to test new "bleeding-edge" functionalities of branch `develop`, you can use the tag `edge`.
 
 |                     | amd64 (default)           | arm32v7 | arm64v8 |
 |---------------------|--------------------------|-----|-----|
@@ -93,8 +95,7 @@ There are some environment variables if you want to customize various things ins
 | `PRIVATE_KEY_FILE_NAME` | `key`                | `<filename>`  | The file name (without extension) of the generated private keys.            |
 | `PRIVATE_KEY_FILE_EXT`  | `.pem`               | `<extension>` | The file extension of the generated private keys.                           |
 | `RSA_KEY_FILE_NAME`     | `rsakey`             | `<filename>`  | The file name (without extension) of the generated private keys in RSA format, see also `CONVERT_KEYS_TO_RSA`. |
-| `RSA_KEY_FILE_EXT`      | `.pem`               | `<extension>` | The file extension of the generated private keys in RSA format, see also `CONVERT_KEYS_TO_RSA`. | 
-
+| `RSA_KEY_FILE_EXT`      | `.pem`               | `<extension>` | The file extension of the generated private keys in RSA format, see also `CONVERT_KEYS_TO_RSA`. |
 
 See below examples for usage.
 
@@ -292,7 +293,6 @@ secrets:
 
 Some applications like [MySQL](https://www.mysql.com/) or [mariaDB](https://mariadb.org/) need their keys in RSA format. In this case, you can set the environment variable `CONVERT_KEYS_TO_RSA`. Each time `traefik-certs-dumper` dumps the certificates, this script will create a file named `rsakey.pem` in each domain's folder respectively. If required, this file name can be configured using the environment variables `RSA_KEY_FILE_NAME` and `RSA_KEY_FILE_EXT`.
 
-
 ```yaml
 version: '3.7'
 
@@ -352,6 +352,6 @@ services:
       POST_HOOK_FILE_PATH: "/to/my/custom/hook.sh"
 ```
 
-## Help!
+## Help
 
 If you need help using this image, have suggestions or want to report a problem, feel free to open an issue on GitHub!
