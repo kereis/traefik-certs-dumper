@@ -16,12 +16,19 @@ RUN ["echo", "certdumper:x:10001:certdumper", ">>", "/etc/group"]
 RUN ["echo", "certdumper:x:10001:10001:certdumper user:/nonexistent:/sbin/nologin", ">>", "/etc/passwd"]
 RUN ["chmod", "+x", "/usr/bin/dump", "/usr/bin/healthcheck"]
 
+RUN ["mkdir", "-p", "/traefik"]
+RUN ["chown", "-R", "10001:10001", "/traefik"]
+VOLUME ["/traefik"]
+
+RUN ["mkdir", "-p", "/output"]
+RUN ["chown", "-R", "10001:10001", "/output"]
+VOLUME ["/output"]
+
 HEALTHCHECK --interval=30s --timeout=10s --retries=5 \
   CMD ["/usr/bin/healthcheck"]
 
 COPY --from=ldez/traefik-certs-dumper:v2.8.1 /usr/bin/traefik-certs-dumper /usr/bin/traefik-certs-dumper
 
-VOLUME ["/traefik"]
-VOLUME ["/output"]
+USER 10001
 
 ENTRYPOINT ["/usr/bin/dump"]
