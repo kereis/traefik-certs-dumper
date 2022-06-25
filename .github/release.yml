@@ -9,6 +9,9 @@ changelog:
     - title: Chores 🧹
       labels:
         - "type: chore"
+    - title: Dependencies ⬆️⬇️
+      labels:
+        - "dependencies"
     - title: Other Changes
       labels:
         - "*"
