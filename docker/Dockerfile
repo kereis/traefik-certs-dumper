@@ -12,6 +12,8 @@ RUN \
 COPY bin/dump.sh /usr/bin/dump
 COPY bin/healthcheck.sh /usr/bin/healthcheck
 
+RUN ["echo", "certdumper:x:10001:certdumper", ">>", "/etc/group"]
+RUN ["echo", "certdumper:x:10001:10001:certdumper user:/nonexistent:/sbin/nologin", ">>", "/etc/passwd"]
 RUN ["chmod", "+x", "/usr/bin/dump", "/usr/bin/healthcheck"]
 
 HEALTHCHECK --interval=30s --timeout=10s --retries=5 \
