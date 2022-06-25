@@ -54,16 +54,25 @@ Special thanks to them!
 
 ### Image choice
 
+#### Releases
 We ship various flavors of this image - multi-arch, Docker (default) and Alpine. The versioning follows [SemVer](https://semver.org/).
 
-|                     | amd64 (normal)           | arm32v7 | arm64v8 |
+|                     | amd64 (default)           | arm32v7 | arm64v8 |
 |---------------------|--------------------------|-----|-----|
-| **Docker (normal)** | `latest`, `x.x.x`, `x.x`, `x` | `arm32v7`, `x.x.x-arm32v7`, `x.x-arm32v7`, `x-arm32v7` | `arm64v8`,`x.x.x-arm64v8`, `x.x-arm64v8`, `x-arm64v8` |
+| **Docker (default)** | `latest`, `x.x.x`, `x.x`, `x` | `arm32v7`, `x.x.x-arm32v7`, `x.x-arm32v7`, `x-arm32v7` | `arm64v8`,`x.x.x-arm64v8`, `x.x-arm64v8`, `x-arm64v8` |
 | **Alpine**          | `alpine`, `x.x.x-alpine`, `x.x-alpine`, `x-alpine` | `arm32v7-alpine`, `x.x.x-arm32v7-alpine`, `x.x-arm32v7-alpine`, `x-arm32v7-alpine` | `arm64v8-alpine`,`x.x.x-arm64v8-alpine`, `x.x-arm64v8-alpine`, `x-arm64v8-alpine` |
 |
 > **`alpine` notes!**
 >
 > Please note that when using the `alpine` variant, using the container restart functionality won't work due to missing Docker installation and will be skipped.
+
+#### Edge builds
+If you don't want to wait for a release or want to test new "bleeding-edge" functionalities of branch `develop`, you can use the tag `edge`. 
+
+|                     | amd64 (default)           | arm32v7 | arm64v8 |
+|---------------------|--------------------------|-----|-----|
+| **Docker (default)** | `edge` | `edge-arm32v7` | `edge-arm64v8` |
+| **Alpine**          | `edge-alpine` | `edge-arm32v7-alpine`| `edge-arm64v8-alpine` |
 
 ### Environment Variables
 
