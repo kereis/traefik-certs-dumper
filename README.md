@@ -43,6 +43,7 @@ Special thanks to them!
   - [Merging private key and public certificate in one .pem](#merging-private-key-and-public-certificate-in-one-pem)
   - [Merging private key and public certificate in one PKCS12 file](#merging-private-key-and-public-certificate-in-one-pkcs12-file)
   - [Convert Keys in RSA format](#convert-keys-in-rsa-format)
+  - [Post-hook script](#post-hook-script)
 - [Help!](#help)
 
 <!-- Added by: humenius, at: Sun 26 Dec 2021 02:14:42 PM CET -->
@@ -62,7 +63,7 @@ We ship various flavors of this image - multi-arch, Docker (default) and Alpine.
 |---------------------|--------------------------|-----|-----|
 | **Docker (default)** | `latest`, `x.x.x`, `x.x`, `x` | `arm32v7`, `x.x.x-arm32v7`, `x.x-arm32v7`, `x-arm32v7` | `arm64v8`,`x.x.x-arm64v8`, `x.x-arm64v8`, `x-arm64v8` |
 | **Alpine**          | `alpine`, `x.x.x-alpine`, `x.x-alpine`, `x-alpine` | `arm32v7-alpine`, `x.x.x-arm32v7-alpine`, `x.x-arm32v7-alpine`, `x-arm32v7-alpine` | `arm64v8-alpine`,`x.x.x-arm64v8-alpine`, `x.x-arm64v8-alpine`, `x-arm64v8-alpine` |
-|
+
 > **`alpine` notes!**
 >
 > Please note that when using the `alpine` variant, using the container restart functionality won't work due to missing Docker installation and will be skipped.
