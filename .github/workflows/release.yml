@@ -129,13 +129,15 @@ jobs:
           images: ${{ env.DOCKER_IMAGE }}
           tags: |
             type=sha
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
+            type=semver,pattern={{version}},suffix=-alpine
+            type=semver,pattern={{version}},suffix=-amd64-alpine
+            type=semver,pattern={{major}}.{{minor}},suffix=-alpine
+            type=semver,pattern={{major}}.{{minor}},suffix=-amd64-alpine
+            type=semver,pattern={{major}},suffix=-alpine
+            type=semver,pattern={{major}},suffix=-amd64-alpine
+            alpine
           flavor: |
             latest=false
-            suffix=-alpine
-            suffix=-amd64-alpine
 
       - name: Prepare tags for arm32v7 build
         id: docker_meta_arm32v7
