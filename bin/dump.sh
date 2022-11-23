@@ -33,7 +33,7 @@ dump() {
     --key-name "${privatekey_file_name}" \
     --key-ext "${privatekey_file_ext}" \
     --domain-subdir \
-    --dest /tmp/work \
+    --dest "${workdir}" \
     --source "${acme_file_path}" >/dev/null
 
   if [[ -z "${DOMAIN}" ]]; then
@@ -211,7 +211,7 @@ change_ownership() {
       log "Combination ${OVERRIDE_UID}:${OVERRIDE_GID} is invalid. Skipping file ownership change..."
     else
       log "Changing ownership of certificates and keys"
-      find ${outputdir}/ -type f \( -name "*${certificate_file_ext}" -o -name "*${privatekey_file_ext}" -o -name "*.p12" \) | while read -r f; do
+      find ${outputdir}/ -type f \( -name "*${certificate_file_ext}" -o -name "*${privatekey_file_ext}" -o -name "*.p12" -o -name "*${rsakey_file_ext}" \) | while read -r f; do
         chown "${OVERRIDE_UID}":"${OVERRIDE_GID}" "$f"
         chmod g+r "$f"
       done
