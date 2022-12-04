@@ -71,7 +71,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and publish image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: .
           file: ./docker/Dockerfile
@@ -82,7 +82,7 @@ jobs:
           labels: ${{ steps.docker_meta.outputs.labels }}
   
       - name: Build and publish image (arm32v7)
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: .
           file: ./docker/Dockerfile.armhf
@@ -94,7 +94,7 @@ jobs:
           labels: ${{ steps.docker_meta_arm32v7.outputs.labels }}
 
       - name: Build and publish image (arm64v8)
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: .
           file: ./docker/Dockerfile.aarch64
@@ -168,7 +168,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and publish image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: .
           file: ./alpine/Dockerfile
@@ -179,7 +179,7 @@ jobs:
           labels: ${{ steps.docker_meta.outputs.labels }}
   
       - name: Build and publish image (arm32v7)
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: .
           file: ./alpine/Dockerfile.armhf
@@ -191,7 +191,7 @@ jobs:
           labels: ${{ steps.docker_meta_arm32v7.outputs.labels }}
 
       - name: Build and publish image (arm64v8)
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: .
           file: ./alpine/Dockerfile.aarch64
