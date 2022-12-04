@@ -84,17 +84,17 @@ There are some environment variables if you want to customize various things ins
 | Variable                | Default              | Value         | Description                                                                 |
 | ----------------------- | -------------------- | ------------- | --------------------------------------------------------------------------- |
 | `ACME_FILE_PATH`        | `/traefik/acme.json` | `<filepath>`  | Full file path to Traefik's certificates storage.                           |
-| `CERTIFICATE_FILE_NAME` | `cert`               | `<filename>`  | The file name (without extension) of the generated certificates.            |
-| `CERTIFICATE_FILE_EXT`  | `.pem`               | `<extension>` | The file extension of the generated certificates.                           |
-| `COMBINE_PKCS12`        | unset                | `yes`         | If set to `yes`, an additional combined PKCS12 file is created.             |
-| `CONVERT_KEYS_TO_RSA`   | unset                | `yes`         | If set to `yes`, keys are created in RSA format also.             |
 | `DOMAIN`                | unset                | `<extension>` | Extract only for specified domains (comma-separated list) - instead of all. |
 | `OVERRIDE_UID`          | unset                | `<number>`    | Change ownership of certificate and key to given `UID`.                     |
 | `OVERRIDE_GID`          | unset                | `<number>`    | Change ownership of certificate and key to given `GID`.                     |
+| `COMBINE_PKCS12`        | unset                | `yes`         | If set to `yes`, an additional combined PKCS12 file is created.             |
 | `PKCS12_PASSWORD`       | unset                | `<password>`  | Password for the combined PKCS12, see also `COMBINE_PKCS12`.                |
 | `POST_HOOK_FILE_PATH`   | `/hook/hook.sh`      | `<filepath>`  | Full file path to the post hook script that should be executed after dumping process |
 | `PRIVATE_KEY_FILE_NAME` | `key`                | `<filename>`  | The file name (without extension) of the generated private keys.            |
 | `PRIVATE_KEY_FILE_EXT`  | `.pem`               | `<extension>` | The file extension of the generated private keys.                           |
+| `CERTIFICATE_FILE_NAME` | `cert`               | `<filename>`  | The file name (without extension) of the generated certificates.            |
+| `CERTIFICATE_FILE_EXT`  | `.pem`               | `<extension>` | The file extension of the generated certificates.                           |
+| `CONVERT_KEYS_TO_RSA`   | unset                | `yes`         | If set to `yes`, keys are created in RSA format also.                       |
 | `RSA_KEY_FILE_NAME`     | `rsakey`             | `<filename>`  | The file name (without extension) of the generated private keys in RSA format, see also `CONVERT_KEYS_TO_RSA`. |
 | `RSA_KEY_FILE_EXT`      | `.pem`               | `<extension>` | The file extension of the generated private keys in RSA format, see also `CONVERT_KEYS_TO_RSA`. |
 
