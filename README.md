@@ -94,6 +94,7 @@ There are some environment variables if you want to customize various things ins
 | `PRIVATE_KEY_FILE_EXT`  | `.pem`               | `<extension>` | The file extension of the generated private keys.                           |
 | `CERTIFICATE_FILE_NAME` | `cert`               | `<filename>`  | The file name (without extension) of the generated certificates.            |
 | `CERTIFICATE_FILE_EXT`  | `.pem`               | `<extension>` | The file extension of the generated certificates.                           |
+| `COMBINED_PEM`          | unset                | `<filename>.pem` | The file name (with extension) of the combined PEM file (no combined certificate + key PEM file will be generated if this env var is not set!)
 | `CONVERT_KEYS_TO_RSA`   | unset                | `yes`         | If set to `yes`, keys are created in RSA format also.                       |
 | `RSA_KEY_FILE_NAME`     | `rsakey`             | `<filename>`  | The file name (without extension) of the generated private keys in RSA format, see also `CONVERT_KEYS_TO_RSA`. |
 | `RSA_KEY_FILE_EXT`      | `.pem`               | `<extension>` | The file extension of the generated private keys in RSA format, see also `CONVERT_KEYS_TO_RSA`. |
