@@ -236,7 +236,7 @@ change_ownership() {
 post_hook() {
   if [[ -x ${posthook_file_path} ]]; then
     log "Post-hook script file found: ${posthook_file_path}. Executing"
-    
+
     if sh "${posthook_file_path}"; then
       log "Post-hook script file ${posthook_file_path} exited successfully."
     else
@@ -317,7 +317,7 @@ check_cmd() {
   local cmd=$1
 
   #check command exist, but no output
-  command -v "$cmd" >/dev/null 
+  command -v "$cmd" >/dev/null
 
   local _result=$?
   if ((_result == 1)); then
@@ -397,53 +397,59 @@ parse_commandline() {
 
 ###############################################
 
-parse_commandline "$@"
+main() {
+  parse_commandline "$@"
 
-_docker_available=$(check_cmd docker)
+  _docker_available=$(check_cmd docker)
 
-if [[ "${_docker_available}" = true ]]; then
+  if [[ "${_docker_available}" = true ]]; then
   if [[ -z "${_arg_restart_containers}" ]]; then
-    log "--restart-containers is empty. Won't attempt to restart containers."
+      log "--restart-containers is empty. Won't attempt to restart containers."
   else
-    log "Got value of --restart-containers: ${_arg_restart_containers}. Splitting values."
-    IFS=',' read -ra CONTAINERS <<<"$_arg_restart_containers"
-    log "Values split! Got '${CONTAINERS[@]}'"
+      log "Got value of --restart-containers: ${_arg_restart_containers}. Splitting values."
+      IFS=',' read -ra CONTAINERS <<<"$_arg_restart_containers"
+      log "Values split! Got '${CONTAINERS[@]}'"
   fi
   if [[ -z "${_arg_restart_services}" ]]; then
-    log "--restart-services is empty. Won't attempt to restart services."
+      log "--restart-services is empty. Won't attempt to restart services."
   else
-    log "Got value of --restart-services: ${_arg_restart_services}. Splitting values."
-    IFS=',' read -ra SERVICES <<<"$_arg_restart_services"
-    log "Values split! Got '${SERVICES[@]}'"
+      log "Got value of --restart-services: ${_arg_restart_services}. Splitting values."
+      IFS=',' read -ra SERVICES <<<"$_arg_restart_services"
+      log "Values split! Got '${SERVICES[@]}'"
   fi
-else
+  else
   log "Docker command is not available. Restart container functionality will not work!"
   log "In case you need it, consider using the Docker version of this image."
   log "(e.g.: humenius/traefik-certs-dumper:latest)"
-fi
+  fi
 
-if [[ -z "${DOMAIN}" ]]; then
+  if [[ -z "${DOMAIN}" ]]; then
   # die "Environment variable DOMAIN mustn't be empty. Exiting..." 1
   log "Environment variable DOMAIN empty. Will dump all certificates possible..."
-else
+  else
   log "Got value of DOMAIN: ${DOMAIN}. Splitting values."
   IFS=',' read -ra DOMAINS <<<"$DOMAIN"
   log "Values split! Got '${DOMAINS[@]}'"
-fi
-
-log "ACME file path: $acme_file_path"
-
-mkdir -p ${workdir}
-dump
-
-while true; do
-  if [[ -f ${acme_file_path} ]]; then
-    inotifywait -qq -e modify "${acme_file_path}"  
-    if [[ $? -eq 0 ]]; then
-      dump
-    fi
-  else
-    log "${acme_file_path} is not a file. Retrying..."
-    sleep 10
   fi
-done
+
+  log "ACME file path: $acme_file_path"
+
+  mkdir -p ${workdir}
+  dump
+
+  while true; do
+  if [[ -f ${acme_file_path} ]]; then
+      inotifywait -qq -e modify "${acme_file_path}"
+      if [[ $? -eq 0 ]]; then
+      dump
+      fi
+  else
+      log "${acme_file_path} is not a file. Retrying..."
+      sleep 10
+  fi
+  done
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  main "$@"
+fi
