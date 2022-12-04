@@ -6,17 +6,11 @@ services:
       context: ../.
       dockerfile: docker/Dockerfile
     # container_name: traefik_certdumper
+    env_file:
+      - .env
     network_mode: none
     volumes:
       - ./acme.json:/traefik/acme.json:ro
       - ./output:/output:rw
       - ./hook.sh:/hook/hook.sh:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-    # environment:
-      # COMBINE_PKCS12: "yes"
-      # PRIVATEKEY_FILE_NAME: "private"
-      # PRIVATEKEY_FILE_EXT: ".key"
-      # CERTIFICATE_FILE_NAME: "public"
-      # CERTIFICATE_FILE_EXT: ".cert"
-      # OVERRIDE_UID: 1001
-      # OVERRIDE_GID: 1001

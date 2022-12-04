@@ -1,2 +1,5 @@
 # Ignore output/ folder created in /dev
 /dev/output
+
+# Ignore .env in /dev folder
+/dev/.env
