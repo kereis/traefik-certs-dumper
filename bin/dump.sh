@@ -127,24 +127,38 @@ dump() {
 }
 
 combine_pem() {
-  if [[ -n "${COMBINED_PEM}" ]]; then
-    if [[ ! "${COMBINED_PEM}" = *\.pem ]]; then
-      #Check if combined_pem filename does have .pem at end of filename
-      log "COMBINED_PEM=${COMBINED_PEM} does not have .pem at end of filename."
-    else
-      if [[ "${#DOMAINS[@]}" -gt 1 ]]; then
-        for i in "${DOMAINS[@]}"; do
-          if [[ -f ${outputdir}/${i}/${certificate_file} && -f ${outputdir}/${i}/${privatekey_file} ]]; then
-            log "Combining key and cert for domain ${i} to single pem with name ${i}/${COMBINED_PEM}"
-            cat ${outputdir}/"${i}"/"${certificate_file}" ${outputdir}/"${i}"/"${privatekey_file}" >${outputdir}/"${i}"/"${COMBINED_PEM}"
-          fi
-        done
-      else
-        if [[ -f ${outputdir}/${certificate_file} && -f ${outputdir}/${privatekey_file} ]]; then
-          log "Combining key and cert to single pem with name ${COMBINED_PEM}"
-          cat ${outputdir}/"${certificate_file}" ${outputdir}/"${privatekey_file}" >${outputdir}/"${COMBINED_PEM}"
-        fi
+  if [[ -z "${COMBINED_PEM+x}" ]]; then
+    return
+  fi
+
+  if [[ ! "${COMBINED_PEM}" = *\.pem ]]; then
+    log "COMBINED_PEM=${COMBINED_PEM} does not have .pem at end of file name, omitting combining PEM step"
+    return
+  fi
+
+  if [[ -z "${DOMAIN}" || "${#DOMAINS[@]}" -gt 1 ]]; then
+    local outputdir_subdirs=("${outputdir}"/*/)
+    for subdir in "${outputdir_subdirs[@]}"; do
+      local current_domain
+      current_domain=$(basename "${subdir}" /)
+
+      local cert_file="${outputdir}/${current_domain}/${certificate_file}"
+      local key_file="${outputdir}/${current_domain}/${privatekey_file}"
+      local combined_pem_file="${outputdir}/${current_domain}/${COMBINED_PEM}"
+
+      if [[ -f ${cert_file} && -f ${key_file} ]]; then
+        log "Combining key and certificate for domain ${current_domain} to single PEM with name ${i}/${COMBINED_PEM}"
+        cat "${cert_file}" "${key_file}" > "${combined_pem_file}"
       fi
+    done
+  else
+    local cert_file="${outputdir}/${certificate_file}"
+    local key_file="${outputdir}/${privatekey_file}"
+    local combined_pem_file="${outputdir}/${COMBINED_PEM}"
+
+    if [[ -f ${cert_file} && -f ${key_file} ]]; then
+      log "Combining key and cert to single PEM with name ${COMBINED_PEM}"
+      cat "${cert_file}" "${key_file}" > "${combined_pem_file}"
     fi
   fi
 }
