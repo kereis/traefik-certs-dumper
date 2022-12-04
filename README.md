@@ -198,8 +198,15 @@ services:
 
 This Docker image is able to extract multiple domains as well.
 Use environment variable `DOMAIN` and add you domains as a comma-separated list.
-After certificate dumping, the certificates can be found in the domains' subdirectories respectively.
-(`/output/DOMAIN[i]/...`)
+After certificate dumping, the certificates can be found in the domains' subdirectories respectively
+(`/output/DOMAIN[i]/...`).
+
+> #### ⚠️ Wildcard certificates and main domains
+>
+> Please note that traefik-certs-dumper dumps certificates based on their main domains. For instance, if you have a domain `example.com` and generate a wildcard domain `*.example.com`, then the certificate's main domain will most likely be `example.com`. This means, you have to use `example.com` in `DOMAIN` in order to have the wildcard certificate dumped. SANS domains will not be respected.
+>
+> You can also take a look at your `acme.json` file as it may give you a clue about what domains (`main`) you can specify via `DOMAIN`.
+
 If you specify a single domain, the output folder remains the same as in previous versions (< v1.3 - `/output`).
 
 ```yaml
@@ -215,6 +222,8 @@ services:
     environment:
       DOMAIN: example.com,example.org,example.net,hello.example.in
 ```
+
+If you leave out `DOMAIN`, then the container will dump all certificates that are available in your mounted `ACME.json`.
 
 ### Health Check
 
