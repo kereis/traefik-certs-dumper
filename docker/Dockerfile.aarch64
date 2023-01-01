@@ -1,4 +1,4 @@
-FROM arm64v8/docker:20.10.21
+FROM arm64v8/docker:20.10.22
 LABEL maintainer="kereis <kreis-dev@gmx.net>"
 
 COPY --from=multiarch/qemu-user-static:x86_64-aarch64 /usr/bin/qemu-aarch64-static /usr/bin/qemu-aarch64-static
