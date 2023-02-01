@@ -23,7 +23,7 @@ jobs:
 
       - name: Prepare tags for normal build
         id: docker_meta
-        uses: docker/metadata-action@v4.1.1
+        uses: docker/metadata-action@v4.3.0
         with:
           images: ${{ env.DOCKER_IMAGE }}
           tags: |
@@ -35,7 +35,7 @@ jobs:
 
       - name: Prepare tags for arm32v7 build
         id: docker_meta_arm32v7
-        uses: docker/metadata-action@v4.1.1
+        uses: docker/metadata-action@v4.3.0
         with:
           images: ${{ env.DOCKER_IMAGE }}
           tags: |
@@ -48,7 +48,7 @@ jobs:
 
       - name: Prepare tags for arm64v8 build
         id: docker_meta_arm64v8
-        uses: docker/metadata-action@v4.1.1
+        uses: docker/metadata-action@v4.3.0
         with:
           images: ${{ env.DOCKER_IMAGE }}
           tags: |
@@ -128,7 +128,7 @@ jobs:
 
       - name: Prepare tags for normal build
         id: docker_meta
-        uses: docker/metadata-action@v4.1.1
+        uses: docker/metadata-action@v4.3.0
         with:
           images: ${{ env.DOCKER_IMAGE }}
           tags: |
@@ -141,7 +141,7 @@ jobs:
 
       - name: Prepare tags for arm32v7 build
         id: docker_meta_arm32v7
-        uses: docker/metadata-action@v4.1.1
+        uses: docker/metadata-action@v4.3.0
         with:
           images: ${{ env.DOCKER_IMAGE }}
           tags: |
@@ -154,7 +154,7 @@ jobs:
 
       - name: Prepare tags for arm64v8 build
         id: docker_meta_arm64v8
-        uses: docker/metadata-action@v4.1.1
+        uses: docker/metadata-action@v4.3.0
         with:
           images: ${{ env.DOCKER_IMAGE }}
           tags: |
