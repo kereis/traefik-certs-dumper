@@ -80,7 +80,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and publish image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: .
           file: ./docker/Dockerfile
@@ -91,7 +91,7 @@ jobs:
           push: ${{ github.event_name == 'release' && github.event.action == 'created' }}
   
       - name: Build and publish image (arm32v7)
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: .
           file: ./docker/Dockerfile.armhf
@@ -103,7 +103,7 @@ jobs:
           push: ${{ github.event_name == 'release' && github.event.action == 'created' }}
 
       - name: Build and publish image (arm64v8)
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: .
           file: ./docker/Dockerfile.aarch64
@@ -188,7 +188,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and publish image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: .
           file: ./alpine/Dockerfile
@@ -199,7 +199,7 @@ jobs:
           push: ${{ github.event_name == 'release' && github.event.action == 'created' }}
   
       - name: Build and publish image (arm32v7)
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: .
           file: ./alpine/Dockerfile.armhf
@@ -211,7 +211,7 @@ jobs:
           push: ${{ github.event_name == 'release' && github.event.action == 'created' }}
 
       - name: Build and publish image (arm64v8)
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: .
           file: ./alpine/Dockerfile.aarch64
