@@ -1,4 +1,4 @@
-name: Build edge image of branch "develop"
+name: Build and release edge image of branch "develop"
 
 on:
   push:
@@ -9,8 +9,8 @@ env:
   DOCKER_IMAGE: kereis/traefik-certs-dumper
 
 jobs:
-  release:
-    name: Release normal (Docker)
+  release-edge:
+    name: Release edge build normal (Docker)
     runs-on: ubuntu-latest
 
     steps:
@@ -63,8 +63,8 @@ jobs:
           labels: ${{ steps.docker_meta.outputs.labels }}
           push: true
 
-  release-alpine:
-    name: Release Alpine
+  release-edge-alpine:
+    name: Release edge build Alpine
     runs-on: ubuntu-latest
 
     steps:
@@ -117,4 +117,3 @@ jobs:
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
           push: true
-
