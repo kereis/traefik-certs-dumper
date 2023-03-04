@@ -58,7 +58,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           builder: ${{ steps.buildx.outputs.name }}
-          platform: linux/amd64,linux/arm64,linux/arm/v7
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
           context: .
           file: ./docker/Dockerfile
           cache-from: type=local,src=/tmp/.buildx-cache
@@ -116,7 +116,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           builder: ${{ steps.buildx.outputs.name }}       
-          platform: linux/amd64,linux/arm64,linux/arm/v7           
+          platforms: linux/amd64,linux/arm64,linux/arm/v7           
           context: .
           file: ./alpine/Dockerfile
           cache-from: type=local,src=/tmp/.buildx-cache
