@@ -13,8 +13,8 @@ env:
   DOCKER_IMAGE: kereis/traefik-certs-dumper
 
 jobs:
-  release:
-    name: Release normal (Docker)
+  build-dev:
+    name: Build normal (Docker)
     runs-on: ubuntu-latest
 
     steps:
@@ -33,34 +33,10 @@ jobs:
           flavor: |
             latest=false
 
-      - name: Prepare tags for arm32v7 build
-        id: docker_meta_arm32v7
-        uses: docker/metadata-action@v4.1.1
-        with:
-          images: ${{ env.DOCKER_IMAGE }}
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=sha
-          flavor: |
-            latest=false
-            suffix=-arm32v7
-
-      - name: Prepare tags for arm64v8 build
-        id: docker_meta_arm64v8
-        uses: docker/metadata-action@v4.1.1
-        with:
-          images: ${{ env.DOCKER_IMAGE }}
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=sha
-          flavor: |
-            latest=false
-            suffix=-arm64v8
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
+        with:
+          platforms: all
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -73,53 +49,28 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Login to Docker Hub registry
-        uses: docker/login-action@v2
-        if: ${{ github.event_name != 'pull_request' }}
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # - name: Login to Docker Hub registry
+      #   uses: docker/login-action@v2
+      #   if: ${{ github.event_name != 'pull_request' }}
+      #   with:
+      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and publish image
+      - name: Build image
         uses: docker/build-push-action@v3
         with:
+          builder: ${{ steps.buildx.outputs.name }}
+          platform: linux/amd64,linux/arm64,linux/arm/v7
           context: .
           file: ./docker/Dockerfile
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-          # push: ${{ github.event_name != 'pull_request' }}
-          push: false
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
-  
-      - name: Build and publish image (arm32v7)
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          file: ./docker/Dockerfile.armhf
-          platforms: linux/arm/v7
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
-          # push: ${{ github.event_name != 'pull_request' }}
           push: false
-          tags: ${{ steps.docker_meta_arm32v7.outputs.tags }}
-          labels: ${{ steps.docker_meta_arm32v7.outputs.labels }}
 
-      - name: Build and publish image (arm64v8)
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          file: ./docker/Dockerfile.aarch64
-          platforms: linux/arm64/v8
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
-          # push: ${{ github.event_name != 'pull_request' }}
-          push: false
-          tags: ${{ steps.docker_meta_arm64v8.outputs.tags }}
-          labels: ${{ steps.docker_meta_arm64v8.outputs.labels }}
-
-  release-alpine:
-    name: Release Alpine
+  build-dev-alpine:
+    name: Build Alpine
     runs-on: ubuntu-latest
 
     steps:
@@ -139,32 +90,6 @@ jobs:
             latest=false
             suffix=-alpine
 
-      - name: Prepare tags for arm32v7 build
-        id: docker_meta_arm32v7
-        uses: docker/metadata-action@v4.1.1
-        with:
-          images: ${{ env.DOCKER_IMAGE }}
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=sha
-          flavor: |
-            latest=false
-            suffix=-arm32v7-alpine
-
-      - name: Prepare tags for arm64v8 build
-        id: docker_meta_arm64v8
-        uses: docker/metadata-action@v4.1.1
-        with:
-          images: ${{ env.DOCKER_IMAGE }}
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=sha
-          flavor: |
-            latest=false
-            suffix=-arm64v8-alpine
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
@@ -179,47 +104,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Login to Docker Hub registry
-        uses: docker/login-action@v2
-        if: ${{ github.event_name != 'pull_request' }}        
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # - name: Login to Docker Hub registry
+      #   uses: docker/login-action@v2
+      #   if: ${{ github.event_name != 'pull_request' }}        
+      #   with:
+      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and publish image
+      - name: Build image
         uses: docker/build-push-action@v3
         with:
+          builder: ${{ steps.buildx.outputs.name }}
+          platform: linux/amd64,linux/arm64,linux/arm/v7
           context: .
-          file: ./alpine/Dockerfile
+          file: ./docker/Dockerfile
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-          # push: ${{ github.event_name != 'pull_request' }}
-          push: false
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
-  
-      - name: Build and publish image (arm32v7)
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          file: ./alpine/Dockerfile.armhf
-          platforms: linux/arm/v7
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
-          # push: ${{ github.event_name != 'pull_request' }}
           push: false
-          tags: ${{ steps.docker_meta_arm32v7.outputs.tags }}
-          labels: ${{ steps.docker_meta_arm32v7.outputs.labels }}
-
-      - name: Build and publish image (arm64v8)
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          file: ./alpine/Dockerfile.aarch64
-          platforms: linux/arm64/v8
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
-          # push: ${{ github.event_name != 'pull_request' }}
-          push: false
-          tags: ${{ steps.docker_meta_arm64v8.outputs.tags }}
-          labels: ${{ steps.docker_meta_arm64v8.outputs.labels }}
