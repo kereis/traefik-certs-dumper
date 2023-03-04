@@ -7,7 +7,7 @@ on:
     branches : [release/*]
 
 env:
-  DOCKER_IMAGE: humenius/traefik-certs-dumper
+  DOCKER_IMAGE: kereis/traefik-certs-dumper
 
 jobs:
   release:
