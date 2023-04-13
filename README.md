@@ -1,18 +1,13 @@
 # traefik-certs-dumper <!-- omit in toc -->
 
-[![Docker Pulls](https://img.shields.io/docker/pulls/humenius/traefik-certs-dumper?logo=docker&style=flat)](https://hub.docker.com/r/humenius/traefik-certs-dumper)
-[![Docker Image Version (latest semver)](https://img.shields.io/docker/v/humenius/traefik-certs-dumper?sort=semver&style=flat)](https://hub.docker.com/r/humenius/traefik-certs-dumper)
 [![GitHub license](https://img.shields.io/github/license/kereis/traefik-certs-dumper)](https://github.com/kereis/traefik-certs-dumper/blob/develop/LICENSE)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/e448ef74f4c9456dae00d75914499990)](https://www.codacy.com/gh/humenius/traefik-certs-dumper/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=humenius/traefik-certs-dumper&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/e448ef74f4c9456dae00d75914499990)](https://www.codacy.com/gh/kereis/traefik-certs-dumper/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=kereis/traefik-certs-dumper&amp;utm_campaign=Badge_Grade)
 
-![Docker Image Size (docker latest)](https://img.shields.io/docker/image-size/humenius/traefik-certs-dumper/latest?label=image%20size%20%28latest%20%22docker%22%29&logo=docker)
-![Docker Image Size (alpine latest)](https://img.shields.io/docker/image-size/humenius/traefik-certs-dumper/alpine?label=image%20size%20%28latest%20%22alpine%22%29&logo=docker)
-
-![Docker Image Size (arm32v7 latest)](https://img.shields.io/docker/image-size/humenius/traefik-certs-dumper/arm32v7?label=image%20size%20%28latest%20%22arm32v7%22%29&logo=docker)
-![Docker Image Size (arm32v7-alpine latest)](https://img.shields.io/docker/image-size/humenius/traefik-certs-dumper/arm32v7-alpine?label=image%20size%20%28latest%20%22arm32v7-alpine%22%29&logo=docker)
-
-![Docker Image Size (arm64v8)](https://img.shields.io/docker/image-size/humenius/traefik-certs-dumper/arm64v8?label=image%20size%20%28latest%20%22arm64v8%22%29&logo=docker)
-![Docker Image Size (arm64v8-alpine latest)](https://img.shields.io/docker/image-size/humenius/traefik-certs-dumper/arm64v8-alpine?label=image%20size%20%28latest%20%22arm64v8-alpine%22%29&logo=docker)
+---
+> ## ⚠️ ATTENTION!
+>
+> This image has been moved and will be released to ghcr.io. Newer releases are now tagged as `ghcr.io/kereis/traefik-certs-dumper`.
+---
 
 Dumps Let's Encrypt certificates of a specified domain to `.pem` and `.key` files which Traefik stores in `acme.json`.
 
@@ -24,6 +19,18 @@ This image uses:
 Special thanks to them!
 
 **IMPORTANT**: It's supposed to work with Traefik **v2** or higher! If you want to use this certificate dumper with **v1**, you can simply change the image to [mailu/traefik-certdumper](https://hub.docker.com/r/mailu/traefik-certdumper).
+
+> ### Old stats
+>
+> [![Docker Pulls](https://img.shields.io/docker/pulls/humenius/traefik-certs-dumper?logo=docker&style=flat)](https://hub.docker.com/r/humenius/traefik-certs-dumper)
+> ![Docker Image Size (tag)](https://img.shields.io/docker/image-size/humenius/traefik-certs-dumper/1.6.1?label=image%20size%20%281.6.1%29&logo=docker)
+> ![Docker Image Size (tag)](https://img.shields.io/docker/image-size/humenius/traefik-certs-dumper/1.6.1-alpine?label=image%20size%20%281.6.1-alpine%29&logo=docker)
+>
+> ![Docker Image Size (tag)](https://img.shields.io/docker/image-size/humenius/traefik-certs-dumper/1.6.1-arm64v8?label=image%20size%20%281.6.1-arm64v8%29&logo=docker)
+> ![Docker Image Size (tag)](https://img.shields.io/docker/image-size/humenius/traefik-certs-dumper/1.6.1-arm64v8-alpine?label=image%20size%20%281.6.1-arm64v8-alpine%29&logo=docker)
+>
+> ![Docker Image Size (tag)](https://img.shields.io/docker/image-size/humenius/traefik-certs-dumper/1.6.1-arm32v7?label=image%20size%20%281.6.1-arm32v7%29&logo=docker)
+> ![Docker Image Size (tag)](https://img.shields.io/docker/image-size/humenius/traefik-certs-dumper/1.6.1-arm32v7-alpine?label=image%20size%20%281.6.1-arm32v7-alpine%29&logo=docker)
 
 ---
 
@@ -46,8 +53,6 @@ Special thanks to them!
   - [Post-hook script](#post-hook-script)
 - [Help!](#help)
 
-<!-- Added by: humenius, at: Sun 26 Dec 2021 02:14:42 PM CET -->
-
 <!--te-->
 ---
 
@@ -57,25 +62,23 @@ Special thanks to them!
 
 #### Releases
 
-We ship various flavors of this image - multi-arch, Docker (default) and Alpine. The versioning follows [SemVer](https://semver.org/).
+We ship various flavors of this image as multi-arch builds: Docker (default) and Alpine. The versioning follows [SemVer](https://semver.org/). 
 
-|                     | amd64 (default)           | arm32v7 | arm64v8 |
-|---------------------|--------------------------|-----|-----|
-| **Docker (default)** | `latest`, `x.x.x`, `x.x`, `x` | `arm32v7`, `x.x.x-arm32v7`, `x.x-arm32v7`, `x-arm32v7` | `arm64v8`,`x.x.x-arm64v8`, `x.x-arm64v8`, `x-arm64v8` |
-| **Alpine**          | `alpine`, `x.x.x-alpine`, `x.x-alpine`, `x-alpine` | `arm32v7-alpine`, `x.x.x-arm32v7-alpine`, `x.x-arm32v7-alpine`, `x-arm32v7-alpine` | `arm64v8-alpine`,`x.x.x-arm64v8-alpine`, `x.x-arm64v8-alpine`, `x-arm64v8-alpine` |
+**Please note** that when using the `alpine` variant, using the container restart functionality won't work due to missing Docker installation and will be skipped.
 
-> **`alpine` notes!**
->
-> Please note that when using the `alpine` variant, using the container restart functionality won't work due to missing Docker installation and will be skipped.
+| Flavor               | Tag |
+|----------------------|--------------------------|
+| **Docker (default)** | `latest`, `x.x.x`, `x.x`, `x` |
+| **Alpine**           | `alpine`, `x.x.x-alpine`, `x.x-alpine`, `x-alpine` |
 
 #### Edge builds
 
 If you don't want to wait for a release or want to test new "bleeding-edge" functionalities of branch `develop`, you can use the tag `edge`.
 
-|                     | amd64 (default)           | arm32v7 | arm64v8 |
-|---------------------|--------------------------|-----|-----|
-| **Docker (default)** | `edge` | `edge-arm32v7` | `edge-arm64v8` |
-| **Alpine**          | `edge-alpine` | `edge-arm32v7-alpine`| `edge-arm64v8-alpine` |
+| Flavor               | Tag |
+|----------------------|--------------------------|
+| **Docker (default)** | `edge`|
+| **Alpine**           | `edge-alpine` |
 
 ### Environment Variables
 
@@ -110,7 +113,7 @@ version: '3.7'
 
 services:
   certdumper:
-    image: humenius/traefik-certs-dumper:latest
+    image: ghcr.io/kereis/traefik-certs-dumper:latest
     volumes:
     - ./traefik/acme:/traefik:ro
     - ./output:/output:rw
@@ -127,7 +130,7 @@ version: '3.7'
 
 services:
   certdumper:
-    image: humenius/traefik-certs-dumper:latest
+    image: ghcr.io/kereis/traefik-certs-dumper:latest
     volumes:
     - ./traefik/acme:/traefik:ro
     - ./output:/output:rw
@@ -145,7 +148,7 @@ version: '3.7'
 
 services:
   certdumper:
-    image: humenius/traefik-certs-dumper:latest
+    image: ghcr.io/kereis/traefik-certs-dumper:latest
     volumes:
       - ./traefik/acme:/my/custom/path:ro
       - ./output:/output:rw
@@ -162,7 +165,7 @@ version: '3.7'
 
 services:
   certdumper:
-    image: humenius/traefik-certs-dumper:latest
+    image: ghcr.io/kereis/traefik-certs-dumper:latest
     command: --restart-containers container1,container2,container3
     volumes:
     - ./traefik/acme:/traefik:ro
@@ -183,7 +186,7 @@ version: '3.7'
 
 services:
   certdumper:
-    image: humenius/traefik-certs-dumper:latest
+    image: ghcr.io/kereis/traefik-certs-dumper:latest
     command: --restart-containers container1,container2,container3
     volumes:
     - ./traefik/acme:/traefik:ro
@@ -208,14 +211,14 @@ After certificate dumping, the certificates can be found in the domains' subdire
 >
 > You can also take a look at your `acme.json` file as it may give you a clue about what domains (`main`) you can specify via `DOMAIN`.
 
-If you specify a single domain, the output folder remains the same as in previous versions (< v1.3 - `/output`).
+If you specify a single domain, the output folder is just `/output`.
 
 ```yaml
 version: '3.7'
 
 services:
   certdumper:
-    image: humenius/traefik-certs-dumper:latest
+    image: ghcr.io/kereis/traefik-certs-dumper:latest
     volumes:
     - ./traefik/acme:/traefik:ro
     - ./output:/output:rw
@@ -224,7 +227,7 @@ services:
       DOMAIN: example.com,example.org,example.net,hello.example.in
 ```
 
-If you leave out `DOMAIN`, then the container will dump all certificates that are available in your mounted `ACME.json`.
+If you leave out `DOMAIN`, then the container will dump all certificates that are available in your mounted `acme.json`.
 
 ### Health Check
 
@@ -237,7 +240,7 @@ version: '3.7'
 
 services:
   certdumper:
-    image: humenius/traefik-certs-dumper:latest
+    image: ghcr.io/kereis/traefik-certs-dumper:latest
     volumes:
     - ./traefik/acme:/traefik:ro
     - ./output:/output:rw
@@ -260,7 +263,7 @@ version: '3.7'
 
 services:
   certdumper:
-    image: humenius/traefik-certs-dumper:latest
+    image: ghcr.io/kereis/traefik-certs-dumper:latest
     volumes:
     - ./traefik/acme:/traefik:ro
     - ./output:/output:rw
@@ -279,7 +282,7 @@ version: '3.7'
 
 services:
   certdumper:
-    image: humenius/traefik-certs-dumper:latest
+    image: ghcr.io/kereis/traefik-certs-dumper:latest
     container_name: traefik_certdumper
     network_mode: none
     volumes:
@@ -309,7 +312,7 @@ version: '3.7'
 
 services:
   certdumper:
-    image: humenius/traefik-certs-dumper:latest
+    image: ghcr.io/kereis/traefik-certs-dumper:latest
     container_name: traefik_certdumper
     network_mode: none
     volumes:
@@ -339,7 +342,7 @@ version: '3.7'
 
 services:
   certdumper:
-    image: humenius/traefik-certs-dumper:latest
+    image: ghcr.io/kereis/traefik-certs-dumper:latest
     volumes:
       - ./traefik/acme:/traefik:ro
       - ./output:/output:rw
@@ -353,7 +356,7 @@ version: '3.7'
 
 services:
   certdumper:
-    image: humenius/traefik-certs-dumper:latest
+    image: ghcr.io/kereis/traefik-certs-dumper:latest
     volumes:
       - ./traefik/acme:/traefik:ro
       - ./output:/output:rw
