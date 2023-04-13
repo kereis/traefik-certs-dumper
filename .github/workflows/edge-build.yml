@@ -6,7 +6,7 @@ on:
       - 'develop'
 
 env:
-  DOCKER_IMAGE: kereis/traefik-certs-dumper
+  DOCKER_IMAGE: ghcr.io/kereis/traefik-certs-dumper
 
 jobs:
   release-edge:

@@ -4,10 +4,10 @@ on:
   release:
     types: [created]
   push:
-    branches : [release/*]
+    branches: [release/*]
 
 env:
-  DOCKER_IMAGE: kereis/traefik-certs-dumper
+  DOCKER_IMAGE: ghcr.io/kereis/traefik-certs-dumper
 
 jobs:
   release:
@@ -51,8 +51,8 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.CR_PAT }}
 
       - name: Build and publish image
         uses: docker/build-push-action@v3
@@ -122,8 +122,8 @@ jobs:
         if: github.event_name != 'pull_request'      
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.CR_PAT }}
 
       - name: Build and publish image
         uses: docker/build-push-action@v3
