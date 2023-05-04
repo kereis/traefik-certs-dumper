@@ -96,7 +96,7 @@ jobs:
       - name: Merge manifest and push
         run: |
           IFS=',' read -ra TAGS <<<"${{ steps.docker_meta.outputs.tags }}"
-          docker buildx imagetools create -t ${{ env.DOCKER_IMAGE }} "${array[@]/#/${{ env.DOCKER_IMAGE }}:}" ${{ env.DOCKER_IMAGE }}:armhf
+          docker buildx imagetools create -t ${{ env.DOCKER_IMAGE }} "${array[@]/#/${{ env.LOCAL_DOCKER_IMAGE }}:}" ${{ env.LOCAL_DOCKER_IMAGE }}:armhf
 
   build-dev-alpine:
     name: Build Alpine
