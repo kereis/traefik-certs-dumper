@@ -92,7 +92,7 @@ jobs:
           push: true
 
       - name: Merge manifest and push
-        rum: |
+        run: |
           IFS=',' read -ra TAGS <<<"${{ steps.docker_meta.outputs.tags }}"
           docker buildx imagetools create -t ${{ env.DOCKER_IMAGE }} "${array[@]/#/${{ env.DOCKER_IMAGE }}:}" ${{ env.DOCKER_IMAGE }}:armhf
 
