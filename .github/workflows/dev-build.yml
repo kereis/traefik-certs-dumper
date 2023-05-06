@@ -97,7 +97,8 @@ jobs:
         run: |
           IFS=',' read -ra TAGS <<<"${{ steps.docker_meta.outputs.tags }}"
           echo "${TAGS[@]}"
-          #docker buildx imagetools create -t ${{ env.DOCKER_IMAGE }} "${array[@]/#/${{ env.LOCAL_DOCKER_IMAGE }}:}" ${{ env.LOCAL_DOCKER_IMAGE }}:armhf
+          echo "${TAGS[@]/#/${{ env.LOCAL_DOCKER_IMAGE }}:}"
+          #docker buildx imagetools create -t ${{ env.DOCKER_IMAGE }} "${TAGS[@]/#/${{ env.LOCAL_DOCKER_IMAGE }}:}" ${{ env.LOCAL_DOCKER_IMAGE }}:armhf
 
   build-dev-alpine:
     name: Build Alpine
