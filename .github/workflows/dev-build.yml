@@ -96,8 +96,8 @@ jobs:
       - name: Merge manifest and push
         run: |
           chmod +x tools/create_and_push_manifest.sh
-          echo ${{ join(steps.docker_meta.outputs.tags, ',') }} "${{ env.DOCKER_IMAGE }}"
-          ./tools/create_and_push_manifest.sh ${{ steps.docker_meta.outputs.tags }} ${{ env.DOCKER_IMAGE }}
+          echo "${{ steps.docker_meta.outputs.tags }}" "${{ env.DOCKER_IMAGE }}"
+          ./tools/create_and_push_manifest.sh "${{ steps.docker_meta.outputs.tags }}" "${{ env.DOCKER_IMAGE }}"
 
   build-dev-alpine:
     name: Build Alpine
