@@ -1,8 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-if (( "$#" != 2 )); then
-    echo "Illegal number of arguments, need 2 arguments: <output of docker/metadata-action> <desired Docker image name>" >&2
+if (( "$#" != 3 )); then
+    echo "Illegal number of arguments, need 2 arguments: <output of docker/metadata-action> <desired Docker image name> <labels>" >&2
     exit 1
 fi
 
@@ -20,6 +20,8 @@ done <<< "$1"
 
 for image_name in "${NEW_IMAGE_NAMES[@]}"; do
     docker buildx imagetools create -t "$image_name" ${LOCAL_IMAGE_NAMES[@]} localhost:5000/traefik-certs-dumper:armhf
+    docker buildx imagetools inspect --raw "$image_name" | jq --arg annotations "$3" '.annotations = $annotations' > descr.json
+    docker buildx imagetools create -t "$image_name" -f descr.json "$image_name"
 done
 
 exit 0
