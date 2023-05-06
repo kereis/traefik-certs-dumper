@@ -95,10 +95,8 @@ jobs:
 
       - name: Merge manifest and push
         run: |
-          IFS=',' read -ra TAGS <<<"${{ steps.docker_meta.outputs.tags }}"
-          echo "${TAGS[@]}"
-          echo "${TAGS[@]/#/${{ env.LOCAL_DOCKER_IMAGE }}:}"
-          #docker buildx imagetools create -t ${{ env.DOCKER_IMAGE }} "${TAGS[@]/#/${{ env.LOCAL_DOCKER_IMAGE }}:}" ${{ env.LOCAL_DOCKER_IMAGE }}:armhf
+          chmod +x tools/create_and_push_manifest.sh
+          ./tools/create_and_push_manifest.sh ${{ steps.docker_meta.outputs.tags }} ${{ env.DOCKER_IMAGE }}
 
   build-dev-alpine:
     name: Build Alpine
