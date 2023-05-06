@@ -41,7 +41,8 @@ jobs:
             latest=false
       - name: Print output of metadata-action
         run: |
-          echo "${{ steps.docker_meta.outputs.json }}"
+          echo '${{ steps.docker_meta.outputs.json }}'
+          echo '${{ steps.docker_meta.outputs.json }}' | jq '.labels'
 
       # - name: Set up QEMU
       #   uses: docker/setup-qemu-action@v2
