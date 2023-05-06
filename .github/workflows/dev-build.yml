@@ -32,7 +32,7 @@ jobs:
         id: docker_meta
         uses: docker/metadata-action@v4.1.1
         with:
-          images: ${{ env.LOCAL_DOCKER_IMAGE }}
+          images: ${{ env.DOCKER_IMAGE }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -93,13 +93,13 @@ jobs:
           labels: ${{ steps.docker_meta.outputs.labels }}
           push: true
 
-      - name: Merge manifest and push
-        run: |
-          chmod +x tools/create_and_push_manifest.sh
-          echo "${{ steps.docker_meta.outputs.tags }}" "${{ env.DOCKER_IMAGE }}"
-          LABELS=$(echo -n "${{ steps.docker_meta.outputs.labels }}" | jq -R -s 'split("\n") | map(split("=")) | map({(.[0]): .[1]}) | add')
-          echo ${LABELS}
-          ./tools/create_and_push_manifest.sh "${{ steps.docker_meta.outputs.tags }}" "${{ env.DOCKER_IMAGE }}" "${LABELS}"
+      # - name: Merge manifest and push
+      #   run: |
+      #     chmod +x tools/create_and_push_manifest.sh
+      #     echo "${{ steps.docker_meta.outputs.tags }}" "${{ env.DOCKER_IMAGE }}"
+      #     LABELS=$(echo -n "${{ steps.docker_meta.outputs.labels }}" | jq -R -s 'split("\n") | map(split("=")) | map({(.[0]): .[1]}) | add')
+      #     echo ${LABELS}
+      #     ./tools/create_and_push_manifest.sh "${{ steps.docker_meta.outputs.tags }}" "${{ env.DOCKER_IMAGE }}" "${LABELS}"
 
   build-dev-alpine:
     name: Build Alpine
