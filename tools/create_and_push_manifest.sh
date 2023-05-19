@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euo pipefail
+set -x
 
 if (( "$#" != 3 )); then
     echo "Illegal number of arguments, need 2 arguments: <output of docker/metadata-action> <desired Docker image name> <labels>" >&2
