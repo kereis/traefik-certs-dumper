@@ -23,7 +23,7 @@ echo "${NEW_IMAGE_NAMES[@]}"
 
 for image_name in "${NEW_IMAGE_NAMES[@]}"; do
     docker buildx imagetools create -t "$image_name" "${LOCAL_IMAGE_NAMES[@]}" localhost:5000/traefik-certs-dumper:armhf
-    docker buildx imagetools inspect --raw "$image_name" | jq --arg annotations "$3" '.annotations = $annotations' > descr.json
+    docker buildx imagetools inspect --raw "$image_name" | jq --argjson annotations "$3" '.annotations = $annotations' > descr.json
     cat descr.json
     docker buildx imagetools create -t "$image_name" -f descr.json "$image_name"
 done
