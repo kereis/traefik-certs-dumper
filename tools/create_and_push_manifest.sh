@@ -13,11 +13,13 @@ NEW_IMAGE_NAMES=()
 LOCAL_IMAGE_NAMES=()
 while IFS=$'\n'; read -ra LOCAL_TAGS; do
     for i in "${LOCAL_TAGS[@]}"; do
-        __tag=$(cut -d ':' -f3 <<< "$i")
+        __tag=$(cut -d ':' -f2 <<< "$i")
         LOCAL_IMAGE_NAMES+=("$i")
         NEW_IMAGE_NAMES+=("$__docker_image_name:$__tag")
     done
 done <<< "$1"
+
+echo "${NEW_IMAGE_NAMES[@]}"
 
 for image_name in "${NEW_IMAGE_NAMES[@]}"; do
     docker buildx imagetools create -t "$image_name" "${LOCAL_IMAGE_NAMES[@]}" localhost:5000/traefik-certs-dumper:armhf
