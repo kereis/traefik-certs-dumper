@@ -96,7 +96,7 @@ jobs:
           chmod +x tools/create_and_push_manifest.sh
           echo "${{ steps.docker_meta.outputs.tags }}" "${{ env.DOCKER_IMAGE }}"
           LABELS=$(echo -n "${{ steps.docker_meta.outputs.labels }}" | jq -R -s 'split("\n") | map(split("=")) | map({(.[0]): .[1]}) | add')
-          ./tools/create_and_push_manifest.sh "${{ steps.docker_meta.outputs.tags }}" "${{ env.DOCKER_IMAGE }}" labels.json          
+          ./tools/create_and_push_manifest.sh "${{ steps.docker_meta.outputs.tags }}" "${{ env.DOCKER_IMAGE }}" "${LABELS}"
 
   release-alpine:
     name: Release Alpine
