@@ -8,11 +8,18 @@ on:
 
 env:
   DOCKER_IMAGE: ghcr.io/kereis/traefik-certs-dumper
+  LOCAL_DOCKER_IMAGE: localhost:5000/traefik-certs-dumper  
 
 jobs:
   release:
     name: Release normal (Docker)
     runs-on: ubuntu-latest
+
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000    
 
     steps:
       - name: Checkout repository
@@ -34,10 +41,13 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
         with:
-          platforms: all
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+        with:
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          driver-opts: network=host          
 
       - name: Cache Docker layers
         uses: actions/cache@v3.0.11
@@ -47,14 +57,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Login to Docker Hub registry
-        if: github.event_name != 'pull_request'
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
+        if: ${{ github.event_name != 'pull_request' }}
         with:
+          registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.CR_PAT }}
 
-      - name: Build and publish image
+      - name: Build image
         uses: docker/build-push-action@v3
         with:
           builder: ${{ steps.buildx.outputs.name }}
@@ -65,9 +76,9 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
-          push: ${{ github.event_name == 'release' && github.event.action == 'created' }}
+          push: true
 
-      - name: Build and publish image (arm32v7)
+      - name: Build image (arm32v7)
         uses: docker/build-push-action@v3
         with:
           builder: ${{ steps.buildx.outputs.name }}
@@ -76,9 +87,16 @@ jobs:
           file: ./docker/Dockerfile.armhf
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-          tags: ${{ steps.docker_meta.outputs.tags }}
+          tags: ${{ env.LOCAL_DOCKER_IMAGE }}:armhf
           labels: ${{ steps.docker_meta.outputs.labels }}
-          push: ${{ github.event_name == 'release' && github.event.action == 'created' }}          
+          push: true
+          
+      - name: Merge manifest and push
+        run: |
+          chmod +x tools/create_and_push_manifest.sh
+          echo "${{ steps.docker_meta.outputs.tags }}" "${{ env.DOCKER_IMAGE }}"
+          LABELS=$(echo -n "${{ steps.docker_meta.outputs.labels }}" | jq -R -s 'split("\n") | map(split("=")) | map({(.[0]): .[1]}) | add')
+          ./tools/create_and_push_manifest.sh "${{ steps.docker_meta.outputs.tags }}" "${{ env.DOCKER_IMAGE }}" labels.json          
 
   release-alpine:
     name: Release Alpine
@@ -118,7 +136,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Login to Docker Hub registry
+      - name: Login to GitHub Container Registry
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v2
         with:

@@ -59,7 +59,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Login to Docker Hub registry
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         if: ${{ github.event_name != 'pull_request' }}
         with:
@@ -135,7 +135,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Login to Docker Hub registry
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         if: ${{ github.event_name != 'pull_request' }}        
         with:
