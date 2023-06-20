@@ -1,5 +1,4 @@
 FROM docker:20.10.21
-LABEL maintainer="kereis <kreis-dev@gmx.net>"
 
 RUN \
     apk update && \

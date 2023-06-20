@@ -352,13 +352,8 @@ CONTAINERS=
 DOMAINS=
 
 print_help() {
-  printf '%s\n' "traefik-certs-dumper bash script by Humenius <contact@humenius.me>"
-  printf 'Usage: %s [-r|--restart-containers <arg>] [--restart-services <arg>] [-h|--help]\n' "$0"
-  printf '\t%s\n' "-r, --restart-containers: Restart containers passed as comma-separated container names (no default)"
-  printf '\t%s\n' "-r, --restart-services: Restart docker services (force-update) passed as comma-separated service names (no default)"
-  printf '\t%s\n' "-h, --help: Prints help"
-  printf 'Environment variables:\n'
-  printf '\t%s\n' "DOMAIN: Domains whose certificates will be extracted"
+  printf 'Usage: %s [OPTIONS...]\n' "$0"
+  printf '\t%s\n' "Please consult https://github.com/kereis/traefik-certs-dumper for available options and environment variables!"
 }
 
 parse_commandline() {

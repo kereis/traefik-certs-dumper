@@ -1,4 +1,4 @@
-name: Build edge image of branch "develop"
+name: Build and release edge image of branch "develop"
 
 on:
   push:
@@ -6,12 +6,19 @@ on:
       - 'develop'
 
 env:
-  DOCKER_IMAGE: humenius/traefik-certs-dumper
+  DOCKER_IMAGE: ghcr.io/kereis/traefik-certs-dumper
+  LOCAL_DOCKER_IMAGE: localhost:5000/traefik-certs-dumper  
 
 jobs:
-  release:
-    name: Release normal (Docker)
+  release-edge:
+    name: Release edge build normal (Docker)
     runs-on: ubuntu-latest
+
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
 
     steps:
       - name: Checkout repository
@@ -27,33 +34,16 @@ jobs:
           flavor: |
             latest=false
 
-      - name: Prepare tags for arm32v7 build
-        id: docker_meta_arm32v7
-        uses: docker/metadata-action@v4.1.1
-        with:
-          images: ${{ env.DOCKER_IMAGE }}
-          tags: |
-            type=edge,branch=develop
-          flavor: |
-            latest=false
-            suffix=-arm32v7
-
-      - name: Prepare tags for arm64v8 build
-        id: docker_meta_arm64v8
-        uses: docker/metadata-action@v4.1.1
-        with:
-          images: ${{ env.DOCKER_IMAGE }}
-          tags: |
-            type=edge,branch=develop
-          flavor: |
-            latest=false
-            suffix=-arm64v8
-
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+    
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+        with:
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          driver-opts: network=host          
 
       - name: Cache Docker layers
         uses: actions/cache@v3.0.11
@@ -63,50 +53,49 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Login to Docker Hub registry
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         if: ${{ github.event_name != 'pull_request' }}
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.CR_PAT }}
 
-      - name: Build and publish image
+      - name: Build image
         uses: docker/build-push-action@v3
         with:
+          builder: ${{ steps.buildx.outputs.name }}
+          platforms: linux/amd64,linux/arm64
           context: .
           file: ./docker/Dockerfile
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-          push: true
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
-  
-      - name: Build and publish image (arm32v7)
+          push: true
+
+      - name: Build image (arm32v7)
         uses: docker/build-push-action@v3
         with:
+          builder: ${{ steps.buildx.outputs.name }}
+          platforms: linux/arm/v7
           context: .
           file: ./docker/Dockerfile.armhf
-          platforms: linux/arm/v7
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
+          tags: ${{ env.LOCAL_DOCKER_IMAGE }}:armhf
+          labels: ${{ steps.docker_meta.outputs.labels }}
           push: true
-          tags: ${{ steps.docker_meta_arm32v7.outputs.tags }}
-          labels: ${{ steps.docker_meta_arm32v7.outputs.labels }}
 
-      - name: Build and publish image (arm64v8)
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          file: ./docker/Dockerfile.aarch64
-          platforms: linux/arm64/v8
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
-          push: true
-          tags: ${{ steps.docker_meta_arm64v8.outputs.tags }}
-          labels: ${{ steps.docker_meta_arm64v8.outputs.labels }}
+      - name: Merge manifest and push
+        run: |
+          chmod +x tools/create_and_push_manifest.sh
+          echo "${{ steps.docker_meta.outputs.tags }}" "${{ env.DOCKER_IMAGE }}"
+          LABELS=$(echo -n "${{ steps.docker_meta.outputs.labels }}" | jq -R -s 'split("\n") | map(split("=")) | map({(.[0]): .[1]}) | add')
+          ./tools/create_and_push_manifest.sh "${{ steps.docker_meta.outputs.tags }}" "${{ env.DOCKER_IMAGE }}" "${LABELS}"
 
-  release-alpine:
-    name: Release Alpine
+  release-edge-alpine:
+    name: Release edge build Alpine
     runs-on: ubuntu-latest
 
     steps:
@@ -124,30 +113,10 @@ jobs:
             latest=false
             suffix=-alpine
 
-      - name: Prepare tags for arm32v7 build
-        id: docker_meta_arm32v7
-        uses: docker/metadata-action@v4.1.1
-        with:
-          images: ${{ env.DOCKER_IMAGE }}
-          tags: |
-            type=edge,branch=develop
-          flavor: |
-            latest=false
-            suffix=-arm32v7-alpine
-
-      - name: Prepare tags for arm64v8 build
-        id: docker_meta_arm64v8
-        uses: docker/metadata-action@v4.1.1
-        with:
-          images: ${{ env.DOCKER_IMAGE }}
-          tags: |
-            type=edge,branch=develop
-          flavor: |
-            latest=false
-            suffix=-arm64v8-alpine
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
+        with:
+          platforms: all        
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -160,44 +129,23 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Login to Docker Hub registry
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         if: ${{ github.event_name != 'pull_request' }}        
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.CR_PAT }}
 
       - name: Build and publish image
         uses: docker/build-push-action@v3
         with:
+          builder: ${{ steps.buildx.outputs.name }}
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
           context: .
           file: ./alpine/Dockerfile
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-          push: true
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
-  
-      - name: Build and publish image (arm32v7)
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          file: ./alpine/Dockerfile.armhf
-          platforms: linux/arm/v7
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
           push: true
-          tags: ${{ steps.docker_meta_arm32v7.outputs.tags }}
-          labels: ${{ steps.docker_meta_arm32v7.outputs.labels }}
-
-      - name: Build and publish image (arm64v8)
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          file: ./alpine/Dockerfile.aarch64
-          platforms: linux/arm64/v8
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
-          push: true
-          tags: ${{ steps.docker_meta_arm64v8.outputs.tags }}
-          labels: ${{ steps.docker_meta_arm64v8.outputs.labels }}
