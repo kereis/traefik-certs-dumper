@@ -10,19 +10,22 @@ fi
 readonly __docker_image_name="$2"
 
 NEW_IMAGE_NAMES=()
-LOCAL_IMAGE_NAMES=()
+LOCAL_IMAGE_NAMES=(localhost:5000/traefik-certs-dumper:multi localhost:5000/traefik-certs-dumper:armhf)
 while IFS=$'\n'; read -ra LOCAL_TAGS; do
     for i in "${LOCAL_TAGS[@]}"; do
         __tag=$(cut -d ':' -f2 <<< "$i")
-        LOCAL_IMAGE_NAMES+=("$i")
         NEW_IMAGE_NAMES+=("$__docker_image_name:$__tag")
     done
 done <<< "$1"
 
 echo "${NEW_IMAGE_NAMES[@]}"
 
+for image in "${LOCAL_IMAGE_NAMES[@]}"; do
+    docker buildx imagetools inspect --raw $image
+done
+
 for image_name in "${NEW_IMAGE_NAMES[@]}"; do
-    docker buildx imagetools create -t "$image_name" localhost:5000/traefik-certs-dumper:multi localhost:5000/traefik-certs-dumper:armhf
+    docker buildx imagetools create -t "$image_name" "${LOCAL_IMAGE_NAMES[@]}"
     # docker buildx imagetools inspect --raw "$image_name" | jq --argjson annotations "$3" '.annotations = $annotations' > descr.json
     # docker buildx imagetools create -t "$image_name" -f descr.json
 done
