@@ -21,13 +21,13 @@ done <<< "$1"
 echo "${NEW_IMAGE_NAMES[@]}"
 
 for image in "${LOCAL_IMAGE_NAMES[@]}"; do
-    docker buildx imagetools inspect --raw $image
+    docker buildx imagetools inspect --raw "$image" | jq --argjson annotations "$3" '.annotations = $annotations'
 done
 
 for image_name in "${NEW_IMAGE_NAMES[@]}"; do
     docker buildx imagetools create -t "$image_name" "${LOCAL_IMAGE_NAMES[@]}"
-    # docker buildx imagetools inspect --raw "$image_name" | jq --argjson annotations "$3" '.annotations = $annotations' > descr.json
-    # docker buildx imagetools create -t "$image_name" -f descr.json
+    docker buildx imagetools inspect --raw "$image_name" | jq --argjson annotations "$3" '.annotations = $annotations' > descr.json
+    docker buildx imagetools create -t "$image_name" -f descr.json
 done
 
 exit 0
