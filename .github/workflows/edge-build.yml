@@ -5,6 +5,10 @@ on:
     branches:
       - 'develop'
 
+permissions:
+  contents: read
+  packages: write
+
 env:
   DOCKER_IMAGE: ghcr.io/kereis/traefik-certs-dumper
   LOCAL_DOCKER_IMAGE: localhost:5000/traefik-certs-dumper  
