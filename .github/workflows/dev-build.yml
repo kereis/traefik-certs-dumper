@@ -20,18 +20,11 @@ permissions:
 
 env:
   DOCKER_IMAGE: ghcr.io/kereis/traefik-certs-dumper
-  LOCAL_DOCKER_IMAGE: localhost:5000/traefik-certs-dumper
 
 jobs:
   build-dev:
     name: Build normal (Docker)
     runs-on: ubuntu-latest
-
-    services:
-      registry:
-        image: registry:2
-        ports:
-          - 5000:5000
 
     steps:
       - name: Checkout repository
@@ -80,36 +73,14 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           builder: ${{ steps.buildx.outputs.name }}
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
           context: .
           file: ./docker/Dockerfile
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-          # tags: ${{ steps.docker_meta.outputs.tags }}
-          tags: ${{ env.LOCAL_DOCKER_IMAGE }}:multi
+          tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
           push: true
-
-      - name: Build image (arm32v7)
-        uses: docker/build-push-action@v3
-        with:
-          builder: ${{ steps.buildx.outputs.name }}
-          platforms: linux/arm/v7
-          context: .
-          file: ./docker/Dockerfile.armhf
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
-          tags: ${{ env.LOCAL_DOCKER_IMAGE }}:armhf
-          labels: ${{ steps.docker_meta.outputs.labels }}
-          push: true
-
-      - name: Merge manifest and push
-        run: |
-          chmod +x tools/create_and_push_manifest.sh
-          echo "${{ steps.docker_meta.outputs.tags }}" "${{ env.DOCKER_IMAGE }}"
-          LABELS=$(echo -n "${{ steps.docker_meta.outputs.labels }}" | jq -R -s 'split("\n") | map(split("=")) | map({(.[0]): .[1]}) | add')
-          ./tools/create_and_push_manifest.sh "${{ steps.docker_meta.outputs.tags }}" "${{ env.DOCKER_IMAGE }}" "${LABELS}"
-
 
   build-dev-alpine:
     name: Build Alpine
