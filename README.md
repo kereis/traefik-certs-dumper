@@ -20,17 +20,17 @@ Special thanks to them!
 
 **IMPORTANT**: It's supposed to work with Traefik **v2** or higher! If you want to use this certificate dumper with **v1**, you can simply change the image to [mailu/traefik-certdumper](https://hub.docker.com/r/mailu/traefik-certdumper).
 
-> ### Old stats
->
-> [![Docker Pulls](https://img.shields.io/docker/pulls/humenius/traefik-certs-dumper?logo=docker&style=flat)](https://hub.docker.com/r/humenius/traefik-certs-dumper)
-> ![Docker Image Size (tag)](https://img.shields.io/docker/image-size/humenius/traefik-certs-dumper/1.6.1?label=image%20size%20%281.6.1%29&logo=docker)
-> ![Docker Image Size (tag)](https://img.shields.io/docker/image-size/humenius/traefik-certs-dumper/1.6.1-alpine?label=image%20size%20%281.6.1-alpine%29&logo=docker)
->
-> ![Docker Image Size (tag)](https://img.shields.io/docker/image-size/humenius/traefik-certs-dumper/1.6.1-arm64v8?label=image%20size%20%281.6.1-arm64v8%29&logo=docker)
-> ![Docker Image Size (tag)](https://img.shields.io/docker/image-size/humenius/traefik-certs-dumper/1.6.1-arm64v8-alpine?label=image%20size%20%281.6.1-arm64v8-alpine%29&logo=docker)
->
-> ![Docker Image Size (tag)](https://img.shields.io/docker/image-size/humenius/traefik-certs-dumper/1.6.1-arm32v7?label=image%20size%20%281.6.1-arm32v7%29&logo=docker)
-> ![Docker Image Size (tag)](https://img.shields.io/docker/image-size/humenius/traefik-certs-dumper/1.6.1-arm32v7-alpine?label=image%20size%20%281.6.1-arm32v7-alpine%29&logo=docker)
+### Old stats
+
+[![Docker Pulls](https://img.shields.io/docker/pulls/humenius/traefik-certs-dumper?logo=docker&style=flat)](https://hub.docker.com/r/humenius/traefik-certs-dumper)
+![Docker Image Size (tag)](https://img.shields.io/docker/image-size/humenius/traefik-certs-dumper/1.6.1?label=image%20size%20%281.6.1%29&logo=docker)
+![Docker Image Size (tag)](https://img.shields.io/docker/image-size/humenius/traefik-certs-dumper/1.6.1-alpine?label=image%20size%20%281.6.1-alpine%29&logo=docker)
+
+![Docker Image Size (tag)](https://img.shields.io/docker/image-size/humenius/traefik-certs-dumper/1.6.1-arm64v8?label=image%20size%20%281.6.1-arm64v8%29&logo=docker)
+![Docker Image Size (tag)](https://img.shields.io/docker/image-size/humenius/traefik-certs-dumper/1.6.1-arm64v8-alpine?label=image%20size%20%281.6.1-arm64v8-alpine%29&logo=docker)
+
+![Docker Image Size (tag)](https://img.shields.io/docker/image-size/humenius/traefik-certs-dumper/1.6.1-arm32v7?label=image%20size%20%281.6.1-arm32v7%29&logo=docker)
+![Docker Image Size (tag)](https://img.shields.io/docker/image-size/humenius/traefik-certs-dumper/1.6.1-arm32v7-alpine?label=image%20size%20%281.6.1-arm32v7-alpine%29&logo=docker)
 
 ---
 
