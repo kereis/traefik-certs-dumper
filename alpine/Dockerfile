@@ -1,4 +1,4 @@
-FROM ldez/traefik-certs-dumper:v2.8.1
+FROM ldez/traefik-certs-dumper:v2.8.3
 
 RUN \
     apk update && \
