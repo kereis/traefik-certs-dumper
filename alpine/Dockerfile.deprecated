@@ -1,4 +1,4 @@
-FROM alpine:3.19.0
+FROM alpine:3.19.1
 
 RUN printf "This image is deprecated and no longer supported. Please switch to ghcr.io/kereis/traefik-certs-dumper.\n\nFor more information, check https://github.com/kereis/traefik-certs-dumper.\n" >> /notice.txt
 
