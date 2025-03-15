@@ -1,10 +1,6 @@
 name: Build dev images
 
 on:
-  push:
-    branches-ignore:
-      - 'release/**'
-      - 'develop'
   pull_request:
     branches-ignore:
       - 'release/**'
@@ -67,7 +63,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.CR_PAT }}
 
       - name: Build image
         uses: docker/build-push-action@v5
@@ -123,7 +119,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.CR_PAT }}
 
       - name: Build image
         uses: docker/build-push-action@v5
