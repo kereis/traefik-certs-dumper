@@ -1,17 +1,23 @@
-FROM ldez/traefik-certs-dumper:v2.8.3
+FROM alpine:3.21.3
 
 RUN \
     apk update && \
     apk add --no-cache \
+        --no-progress \
         inotify-tools \
         util-linux \
         bash \
-        openssl
+        openssl \
+        ca-certificates \
+        tzdata && \
+    rm -rf /var/cache/apk/*
 
 COPY bin/dump.sh /usr/bin/dump
 COPY bin/healthcheck.sh /usr/bin/healthcheck
 
 RUN ["chmod", "+x", "/usr/bin/dump", "/usr/bin/healthcheck"]
+
+COPY --from=ldez/traefik-certs-dumper:v2.10.0 /usr/bin/traefik-certs-dumper /usr/bin/traefik-certs-dumper
 
 HEALTHCHECK --interval=30s --timeout=10s --retries=5 \
   CMD ["/usr/bin/healthcheck"]
