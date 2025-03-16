@@ -28,6 +28,11 @@ jobs:
             exit 1
           fi
 
+          if (( $(git diff --name-only $last_release HEAD | grep -v '.github' | wc -l) == 0 )); then
+            echo "::warning title=Changes in .github only::The diff contains changes that are only related to GitHub Actions. Won't create release!"
+            exit 1
+          fi
+
           echo "LAST_RELEASE=$last_release" >> "$GITHUB_OUTPUT"
 
       - name: Bump patch version
