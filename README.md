@@ -62,7 +62,7 @@ Special thanks to them!
 
 #### Releases
 
-We ship various flavors of this image as multi-arch builds: Docker (default) and Alpine. The versioning follows [SemVer](https://semver.org/). 
+We ship various flavors of this image as multi-arch builds: Docker (default) and Alpine. The versioning follows [SemVer](https://semver.org/).
 
 **Please note** that when using the `alpine` variant, using the container restart functionality won't work due to missing Docker installation and will be skipped.
 
@@ -70,6 +70,13 @@ We ship various flavors of this image as multi-arch builds: Docker (default) and
 |----------------------|--------------------------|
 | **Docker (default)** | `latest`, `x.x.x`, `x.x`, `x` |
 | **Alpine**           | `alpine`, `x.x.x-alpine`, `x.x-alpine`, `x-alpine` |
+
+
+Additionally, we run scheduled workflows that auto-release a new version if there are any dependency updates.
+
+- Dependabot PRs are auto-merged for each incoming Dependabot merge request
+- On each Sunday around 4:00 a.m. UTC, an auto-release workflow is triggered, which automatically creates a new release
+- Auto-released versions contain `(auto-release)` in the release's title
 
 #### Edge builds
 
