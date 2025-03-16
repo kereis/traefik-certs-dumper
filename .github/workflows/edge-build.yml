@@ -55,7 +55,7 @@ jobs:
         if: ${{ github.event_name != 'pull_request' }}
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
+          username: kereis
           password: ${{ secrets.CR_PAT }}
 
       - name: Build image
@@ -111,7 +111,7 @@ jobs:
         if: ${{ github.event_name != 'pull_request' }}        
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
+          username: kereis
           password: ${{ secrets.CR_PAT }}
 
       - name: Build and publish image
