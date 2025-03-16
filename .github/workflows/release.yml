@@ -129,3 +129,40 @@ jobs:
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
           push: ${{ github.event_name == 'release' && github.event.action == 'created' }}
+
+  update-main-branch:
+    name: Update main (master) branch (by auto-release)
+    runs-on: ubuntu-latest
+    if: contains(github.event.release.name, 'auto-release')
+    needs:
+      - release
+      - release-alpine
+    permissions:
+      contents: write
+    env:
+      TAG: ${{ github.event.release.tag_name }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update master branch
+        id: update_master_branch
+        run: |
+          release_branch=release/$(echo "$TAG" | cut -d 'v' -f 2)
+
+          git checkout master
+          git merge origin/$release_branch
+          git push
+
+          echo "RELEASE_BRANCH=$release_branch" >> "$GITHUB_OUTPUT"
+
+      - name: Update develop branch
+        run: |
+          git checkout develop
+          git merge master
+          git push
+
+      - name: Delete release branch
+        env:
+          RELEASE_BRANCH: ${{ steps.update_master_branch.outputs.RELEASE_BRANCH }}
+        run: git push origin --delete $RELEASE_BRANCH

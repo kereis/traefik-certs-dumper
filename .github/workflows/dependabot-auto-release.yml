@@ -1,0 +1,80 @@
+name: Dependency updates auto-release
+
+on:
+  schedule:
+    - cron: '0 4 * * 6'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: Create release with auto-updates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Make sure diff contains dependency updates only
+        id: deps_only_check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          last_release=$(gh release list --json tagName,isLatest --jq '.[] | select(.isLatest) | .tagName')
+          count_of_non_updates_commits=$(git log --pretty=format:"%an" HEAD...$last_release | uniq | grep -v '^dependabot\[bot\]$' | wc -l)
+          if (( $count_of_non_updates_commits > 0 )); then
+            echo "::error title=Non-update commits detected::git-log contains more than one commit that is not authored by dependabot[bot]. Please create release manually!"
+            exit 1
+          fi
+
+          if (( $(git diff --name-only $last_release HEAD | grep -v '.github' | wc -l) == 0 )); then
+            echo "::warning title=Changes in .github only::The diff contains changes that are only related to GitHub Actions. Won't create release!"
+            exit 1
+          fi
+
+          echo "LAST_RELEASE=$last_release" >> "$GITHUB_OUTPUT"
+
+      - name: Bump patch version
+        id: new_version_tag
+        env:
+          LAST_RELEASE: ${{ steps.deps_only_check.outputs.LAST_RELEASE }}
+        run: |
+          major=$(echo "$LAST_RELEASE" | cut -d '.' -f 1)
+          minor=$(echo "$LAST_RELEASE" | cut -d '.' -f 2)
+          patch=$(echo "$LAST_RELEASE" | cut -d '.' -f 3)
+
+          echo "Version split - major: $major, minor: $minor, patch: $patch"
+
+          new_patch_version=$(echo "$patch + 1" | bc)
+          echo "New patch version: $new_patch_version"
+
+          new_version=$(echo "$major.$minor.$new_patch_version")
+          echo "::notice::Bumped version: $new_version"
+
+          echo "NEW_VERSION=$new_version" >> "$GITHUB_OUTPUT"
+
+      - name: Create release branch
+        id: create_release_branch
+        env: 
+          NEW_VERSION: ${{ steps.new_version_tag.outputs.NEW_VERSION }}
+        run: |
+          release_branch=release/$(echo "$NEW_VERSION" | cut -d 'v' -f 2)
+          git checkout -b $release_branch && git push origin HEAD
+
+          echo "::notice::Release branch: $release_branch"
+
+          echo "RELEASE_BRANCH=$release_branch" >> "$GITHUB_OUTPUT"
+
+      - name: Create new release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEW_VERSION: ${{ steps.new_version_tag.outputs.NEW_VERSION }}
+          RELEASE_BRANCH: ${{ steps.create_release_branch.outputs.RELEASE_BRANCH }}
+        run: |
+          gh release create "$NEW_VERSION" \
+            --title "$NEW_VERSION (auto-release)" \
+            --generate-notes \
+            --target "$RELEASE_BRANCH" \
+            --discussion-category "General" \
+            --latest
