@@ -52,11 +52,10 @@ jobs:
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
-        if: ${{ github.event_name != 'pull_request' }}
         with:
           registry: ghcr.io
-          username: kereis
-          password: ${{ secrets.CR_PAT }}
+          username: "${{ github.actor }}"
+          password: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Build image
         uses: docker/build-push-action@v6
@@ -107,12 +106,11 @@ jobs:
             ${{ runner.os }}-buildx-
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        if: ${{ github.event_name != 'pull_request' }}        
+        uses: docker/login-action@v3    
         with:
           registry: ghcr.io
-          username: kereis
-          password: ${{ secrets.CR_PAT }}
+          username: "${{ github.actor }}"
+          password: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Build and publish image
         uses: docker/build-push-action@v6
