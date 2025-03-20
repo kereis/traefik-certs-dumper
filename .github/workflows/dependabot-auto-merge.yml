@@ -19,7 +19,7 @@ jobs:
           private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
           owner: "kereis"
           repositories: |
-            ${{ github.repository }}
+            traefik-certs-dumper
   
       - name: Fetch metadata
         id: metadata
