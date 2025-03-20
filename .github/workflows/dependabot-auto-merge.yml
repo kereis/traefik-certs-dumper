@@ -19,7 +19,7 @@ jobs:
           private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
           owner: "kereis"
           repositories: |
-            $GITHUB_REPOSITORY
+            ${{ github.repository }}
   
       - name: Fetch metadata
         id: metadata
