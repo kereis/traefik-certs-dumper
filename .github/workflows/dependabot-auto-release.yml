@@ -4,6 +4,12 @@ on:
   schedule:
     - cron: '0 4 * * 0'
   workflow_dispatch:
+    inputs:
+      force_create:
+        description: 'Create release regardless of mixed feature and dependency updates'
+        type: boolean
+        required: true
+        default: false
 
 permissions:
   contents: write
@@ -32,7 +38,7 @@ jobs:
           fi
           
           count_of_non_updates_commits=$(git log --pretty=format:"%an" HEAD...$last_release | uniq | grep -v '^dependabot\[bot\]$' | wc -l)
-          if (( $count_of_non_updates_commits > 0 )); then
+          if [[ "${{ inputs.force_create }}" != 'true' ]] || (( $count_of_non_updates_commits > 0 )); then
             echo "::error title=Non-update commits detected::git-log contains more than one commit that is not authored by dependabot[bot]. Please create release manually!"
             exit 1
           fi
