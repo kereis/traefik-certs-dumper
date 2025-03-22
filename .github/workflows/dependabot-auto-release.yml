@@ -3,6 +3,7 @@ name: Dependency updates auto-release
 on:
   schedule:
     - cron: '0 4 * * 6'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -22,6 +23,12 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           last_release=$(gh release list --json tagName,isLatest --jq '.[] | select(.isLatest) | .tagName')
+
+          if git diff --quiet HEAD...$last_release; then
+            echo "::warning title=No changes detected::There are no changed files between current state and last release '$last_release'. Won't create release!"
+            exit 1
+          fi
+          
           count_of_non_updates_commits=$(git log --pretty=format:"%an" HEAD...$last_release | uniq | grep -v '^dependabot\[bot\]$' | wc -l)
           if (( $count_of_non_updates_commits > 0 )); then
             echo "::error title=Non-update commits detected::git-log contains more than one commit that is not authored by dependabot[bot]. Please create release manually!"
