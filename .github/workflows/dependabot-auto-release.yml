@@ -31,19 +31,20 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           last_release=$(gh release list --json tagName,isLatest --jq '.[] | select(.isLatest) | .tagName')
+          last_release_tag=$(git tag -l | grep -F $last_release)
 
-          if git diff --quiet HEAD...$last_release; then
+          if git diff --quiet HEAD...$last_release_tag; then
             echo "::warning title=No changes detected::There are no changed files between current state and last release '$last_release'. Won't create release!"
             exit 1
           fi
           
-          count_of_non_updates_commits=$(git log --pretty=format:"%an" HEAD...$last_release | uniq | grep -v '^dependabot\[bot\]$' | wc -l)
+          count_of_non_updates_commits=$(git log --pretty=format:"%an" HEAD...$last_release_tag | uniq | grep -v '^dependabot\[bot\]$' | wc -l)
           if [[ "${{ inputs.force_create }}" != 'true' ]] || (( $count_of_non_updates_commits > 0 )); then
             echo "::error title=Non-update commits detected::git-log contains more than one commit that is not authored by dependabot[bot]. Please create release manually!"
             exit 1
           fi
 
-          if (( $(git diff --name-only $last_release HEAD | grep -v '.github' | wc -l) == 0 )); then
+          if (( $(git diff --name-only $last_release_tag HEAD | grep -v '.github' | wc -l) == 0 )); then
             echo "::warning title=Changes in .github only::The diff contains changes that are only related to GitHub Actions. Won't create release!"
             exit 1
           fi
