@@ -38,7 +38,7 @@ jobs:
           echo $(git tag -l | grep -F $last_release)
           last_release_tag=$(git tag -l | grep -F $last_release)
 
-          if git diff --quiet HEAD...$last_release_tag; then
+          if git diff --quiet $last_release_tag...HEAD; then
             echo "::warning title=No changes detected::There are no changed files between current state and last release '$last_release'. Won't create release!"
             exit 1
           fi
