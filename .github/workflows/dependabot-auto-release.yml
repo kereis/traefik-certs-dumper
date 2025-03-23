@@ -31,6 +31,7 @@ jobs:
       - name: Make sure diff contains dependency updates only
         id: deps_only_check
         run: |
+          set -x
           last_release=$(gh release list --json tagName,isLatest --jq '.[] | select(.isLatest) | .tagName')
           last_release_tag=$(git tag -l | grep -F $last_release)
 
@@ -51,6 +52,7 @@ jobs:
           fi
 
           echo "LAST_RELEASE=$last_release" >> "$GITHUB_OUTPUT"
+          set +x
 
       - name: Bump patch version
         id: new_version_tag
