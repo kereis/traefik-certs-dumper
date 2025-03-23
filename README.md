@@ -2,11 +2,9 @@
 
 [![GitHub license](https://img.shields.io/github/license/kereis/traefik-certs-dumper)](https://github.com/kereis/traefik-certs-dumper/blob/develop/LICENSE)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/e448ef74f4c9456dae00d75914499990)](https://www.codacy.com/gh/kereis/traefik-certs-dumper/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=kereis/traefik-certs-dumper&amp;utm_campaign=Badge_Grade)
+[![Dependency updates auto-release](https://github.com/kereis/traefik-certs-dumper/actions/workflows/dependabot-auto-release.yml/badge.svg)](https://github.com/kereis/traefik-certs-dumper/actions/workflows/dependabot-auto-release.yml)
+[![Release Docker image](https://github.com/kereis/traefik-certs-dumper/actions/workflows/release.yml/badge.svg)](https://github.com/kereis/traefik-certs-dumper/actions/workflows/release.yml)
 
----
-> ## ⚠️ ATTENTION!
->
-> This image has been moved and will be released to ghcr.io. Newer releases are now tagged as `ghcr.io/kereis/traefik-certs-dumper`.
 ---
 
 Dumps Let's Encrypt certificates of a specified domain to `.pem` and `.key` files which Traefik stores in `acme.json`.
