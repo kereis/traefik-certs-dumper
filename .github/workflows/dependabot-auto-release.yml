@@ -11,10 +11,6 @@ on:
         required: true
         default: false
 
-permissions:
-  contents: write
-  pull-requests: write
-
 jobs:
   release:
     name: Create release with auto-updates
@@ -26,8 +22,18 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
+      - name: Create access token
+        uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ vars.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+          owner: "kereis"
+          repositories: |
+            traefik-certs-dumper
+
       - name: Authenticate GitHub CLI
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+        run: echo "${{ steps.app-token.outputs.token }}" | gh auth login --with-token
 
       - name: Make sure diff contains dependency updates only
         id: deps_only_check
@@ -86,7 +92,6 @@ jobs:
 
       - name: Create new release
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NEW_VERSION: ${{ steps.new_version_tag.outputs.NEW_VERSION }}
           RELEASE_BRANCH: ${{ steps.create_release_branch.outputs.RELEASE_BRANCH }}
         run: |
