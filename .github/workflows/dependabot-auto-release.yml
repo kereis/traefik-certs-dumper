@@ -33,6 +33,8 @@ jobs:
         run: |
           set -x
           last_release=$(gh release list --json tagName,isLatest --jq '.[] | select(.isLatest) | .tagName')
+          git tag -l
+          echo $(git tag -l | grep -F $last_release)
           last_release_tag=$(git tag -l | grep -F $last_release)
 
           if git diff --quiet HEAD...$last_release_tag; then
