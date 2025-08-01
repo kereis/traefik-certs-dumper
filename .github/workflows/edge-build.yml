@@ -23,7 +23,7 @@ jobs:
 
       - name: Prepare tags for normal build
         id: docker_meta
-        uses: docker/metadata-action@v5.7.0
+        uses: docker/metadata-action@v5.8.0
         with:
           images: ${{ env.DOCKER_IMAGE }}
           tags: |
@@ -80,7 +80,7 @@ jobs:
 
       - name: Prepare tags for normal build
         id: docker_meta
-        uses: docker/metadata-action@v5.7.0
+        uses: docker/metadata-action@v5.8.0
         with:
           images: ${{ env.DOCKER_IMAGE }}
           tags: |
