@@ -7,19 +7,16 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-    reviewers: ["kereis"]
     assignees: ["kereis"]
 
   - package-ecosystem: "docker"
     directory: "/docker"
     schedule: 
       interval: "daily"
-    reviewers: ["kereis"]
     assignees: ["kereis"]
 
   - package-ecosystem: "docker"
     directory: "/alpine"
     schedule: 
       interval: "daily"
-    reviewers: ["kereis"]
     assignees: ["kereis"]
