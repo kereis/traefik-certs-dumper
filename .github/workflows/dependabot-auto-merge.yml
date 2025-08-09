@@ -12,7 +12,7 @@ jobs:
     if: github.event.pull_request.user.login == 'dependabot[bot]' && github.repository == 'kereis/traefik-certs-dumper'
     steps:
       - name: Create access token
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@0f859bf9e69e887678d5bbfbee594437cb440ffe # v2.1.0
         id: app-token
         with:
           app-id: ${{ vars.GH_APP_ID }}
@@ -23,7 +23,7 @@ jobs:
   
       - name: Fetch metadata
         id: metadata
-        uses: dependabot/fetch-metadata@v2.4.0
+        uses: dependabot/fetch-metadata@08eff52bf64351f401fb50d4972fa95b9f2c2d1b # v2.4.0
         with:
           github-token: "${{ steps.app-token.outputs.token }}"
 
