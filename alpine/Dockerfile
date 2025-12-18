@@ -1,6 +1,6 @@
 FROM ldez/traefik-certs-dumper:v2.10.0 AS traefik-certs-dumper
 
-FROM alpine:3.23.0
+FROM alpine:3.23.2
 
 RUN \
     apk update && \
