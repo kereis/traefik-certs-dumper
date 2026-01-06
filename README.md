@@ -158,7 +158,7 @@ services:
       - ./traefik/acme:/my/custom/path:ro
       - ./output:/output:rw
     environment:
-      - ACME_FILE: /my/custom/path/acme_the_second.json
+      - ACME_FILE_PATH=/my/custom/path/acme_the_second.json
 ```
 
 ### Automatic container restart
