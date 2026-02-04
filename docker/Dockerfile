@@ -1,6 +1,6 @@
 FROM ldez/traefik-certs-dumper:v2.11.0 AS traefik-certs-dumper
 
-FROM docker:29.2.0
+FROM docker:29.2.1
 
 RUN \
     apk update && \
