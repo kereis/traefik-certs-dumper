@@ -1,4 +1,4 @@
-FROM ldez/traefik-certs-dumper:v2.11.0 AS traefik-certs-dumper
+FROM ldez/traefik-certs-dumper:v2.11.2 AS traefik-certs-dumper
 
 FROM docker:29.4.0
 
