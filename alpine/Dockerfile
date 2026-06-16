@@ -1,4 +1,4 @@
-FROM ldez/traefik-certs-dumper:v2.11.3 AS traefik-certs-dumper
+FROM ldez/traefik-certs-dumper:v2.11.4 AS traefik-certs-dumper
 
 FROM alpine:3.24.0
 
