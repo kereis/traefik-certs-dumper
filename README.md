@@ -181,6 +181,7 @@ services:
 ```
 
 It is also possible to restart Docker services. You can specify their names exactly like the containers via the optional parameter `--restart-services`. The services are updated with the command `docker service update --force <service_name>` which restarts all tasks in the service.
+If you use `--restart-services` it is important to change the space sign after the command to an eqal sign: `command: --restart-services=service1,service2,service3`!
 
 ### Change ownership of certificate and key files
 
