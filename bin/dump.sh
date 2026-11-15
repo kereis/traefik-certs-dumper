@@ -4,7 +4,9 @@ workdir=/tmp/work
 outputdir=/output
 re='^[0-9]+$'
 
-acme_file_path=${ACME_FILE_PATH:-/traefik/acme.json}
+ACME_FILE_PATH=${ACME_FILE_PATH:-/traefik/acme.json}
+acme_file_path=
+acme_file_paths=()
 posthook_file_path=${POST_HOOK_FILE_PATH:-/hook/hook.sh}
 certificate_file_name=${CERTIFICATE_FILE_NAME:-cert}
 certificate_file_ext=${CERTIFICATE_FILE_EXT:-.pem}
@@ -20,6 +22,26 @@ rsakey_file=${rsakey_file_name}${rsakey_file_ext}
 ###############################################
 ####             DUMPING LOGIC             ####
 ###############################################
+
+collect_acme_file_paths() {
+  acme_file_paths=()
+  local -a tokens=()
+  read -ra tokens <<<"${ACME_FILE_PATH}"
+  local token match
+  for token in "${tokens[@]}"; do
+    if [[ "${token}" == *[\*\?\[]* ]]; then
+      shopt -s nullglob
+      for match in ${token}; do
+        if [[ -f "${match}" ]]; then
+          acme_file_paths+=("${match}")
+        fi
+      done
+      shopt -u nullglob
+    elif [[ -f "${token}" ]]; then
+      acme_file_paths+=("${token}")
+    fi
+  done
+}
 
 dump() {
   log "Clearing dumping directory"
@@ -426,19 +448,27 @@ else
   log "Values split! Got '${DOMAINS[@]}'"
 fi
 
-log "ACME file path: $acme_file_path"
+log "ACME file path configuration: ${ACME_FILE_PATH}"
 
 mkdir -p ${workdir}
-dump
 
 while true; do
-  if [[ -f ${acme_file_path} ]]; then
-    inotifywait -qq -e modify "${acme_file_path}"  
-    if [[ $? -eq 0 ]]; then
-      dump
-    fi
-  else
-    log "${acme_file_path} is not a file. Retrying..."
+  collect_acme_file_paths
+  if [[ ${#acme_file_paths[@]} -eq 0 ]]; then
+    log "${ACME_FILE_PATH} does not refer to any existing files. Retrying..."
     sleep 10
+    continue
+  fi
+
+  log "Monitoring ${#acme_file_paths[@]} ACME file(s): ${acme_file_paths[*]}"
+
+  for acme_file_path in "${acme_file_paths[@]}"; do
+    dump
+  done
+
+  changed=$(inotifywait -q -e modify --format '%w%f' "${acme_file_paths[@]}")
+  if [[ $? -eq 0 && -n "${changed}" && -f "${changed}" ]]; then
+    acme_file_path="${changed}"
+    dump
   fi
 done

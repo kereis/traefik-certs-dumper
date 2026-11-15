@@ -91,7 +91,7 @@ There are some environment variables if you want to customize various things ins
 
 | Variable                | Default              | Value            | Description                                                                 |
 | ----------------------- | -------------------- | ---------------- | --------------------------------------------------------------------------- |
-| `ACME_FILE_PATH`        | `/traefik/acme.json` | `<filepath>`     | Full file path to Traefik's certificates storage.                           |
+| `ACME_FILE_PATH`        | `/traefik/acme.json` | `<filepath>`     | Path to Traefik certificate storage; space-separated list or globs for multiple files. |
 | `DOMAIN`                | unset                | `<extension>`    | Extract only for specified domains (comma-separated list) - instead of all. |
 | `OVERRIDE_UID`          | unset                | `<number>`       | Change ownership of certificate and key to given `UID`.                     |
 | `OVERRIDE_GID`          | unset                | `<number>`       | Change ownership of certificate and key to given `GID`.                     |
@@ -148,6 +148,8 @@ services:
 
 Use environment variable `ACME_FILE_PATH` if you don't want to use the default path or if your ACME JSON file has a different name.
 
+You can also pass **multiple** ACME files (for example when Traefik uses separate resolver storage per DNS provider) as a **space-separated** list. Shell globs such as `/traefik/acme*.json` are expanded; only regular files are used.
+
 ```yaml
 version: '3.7'
 
@@ -159,6 +161,11 @@ services:
       - ./output:/output:rw
     environment:
       - ACME_FILE_PATH=/my/custom/path/acme_the_second.json
+```
+
+```yaml
+    environment:
+      - ACME_FILE_PATH=/traefik/acme.json /traefik/acme-dns.json
 ```
 
 ### Automatic container restart
